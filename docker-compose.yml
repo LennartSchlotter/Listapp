@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${APP_NAME}-db
+    hostname: db
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+    ports:
+      - ${POSTGRES_OUTERPORT:-5432}:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  client:
+    #image: ${REGISTRY:-local}/${APP_NAME}-client:${TAG:-latest}
+    build:
+      context: ./listapp-client
+      target: ${CLIENT_TARGET:-development}
+    container_name: ${APP_NAME}-client
+    hostname: client
+    ports:
+      - ${CLIENT_OUTERPORT:-5173}:5173
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+    volumes:
+      - ./listapp-client:/app
+      - /app/node_modules
+    profiles: ["docker", "fullstack"]
+
+  server:
+    #image: ${REGISTRY:-local}/${APP_NAME}-server:${TAG:-latest}
+    build:
+      context: ./listapp
+      target: ${SERVER_TARGET:-development}
+    container_name: ${APP_NAME}-server
+    hostname: server
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-app}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-app}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    ports:
+      - ${SERVER_OUTERPORT:-8080}:8080
+      - 5005:5005
+    volumes:
+      - ./listapp:/app
+      - ~/.m2:/root/.m2
+    depends_on:
+      - postgres
+    profiles: ["docker", "fullstack"]
+
+volumes:
+  db_data:
