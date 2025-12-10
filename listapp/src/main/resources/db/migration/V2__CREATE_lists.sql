@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS lists (
-  id BIGSERIAL PRIMARY KEY,
-  owner_id BIGINT NOT NULL,
-  title VARCHAR(255) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(100) NOT NULL,
   description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  CONSTRAINT fk_lists_owner FOREIGN KEY (owner_id)
-    REFERENCES users (id) ON DELETE CASCADE
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted BOOLEAN NOT NULL DEFAULT false,
+  version BIGINT NOT NULL DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS idx_lists_owner_id ON lists (owner_id);
