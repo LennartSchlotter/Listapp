@@ -1,0 +1,91 @@
+package com.example.listapp.entity;
+
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+
+@DynamicUpdate
+@Getter
+@Setter
+@SQLRestriction("deleted = false")
+@Entity
+@Table(name="users")
+public class User {
+
+    @Id 
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "uuid", nullable = false)
+    private UUID id;
+    
+    private String oauth2_provider;
+
+    @Column(nullable = false)
+    private String oauth2_sub;
+
+    @NotBlank(message = "Name is required")
+    @Size(max = 64)
+    @Column(length = 64, nullable = false, unique = true)
+    private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @Size(max = 255)
+    @Column(length = 255, nullable = false, unique = true)
+    private String email;
+    
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private Set<List> lists = new HashSet<>();
+    
+    @CreationTimestamp
+    @Column(name="created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+    
+    @UpdateTimestamp
+    @Column(name="updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    @Version
+    private Long version;
+
+    /**
+     * Helper method to determine the deletion state of a user.
+     * @return a boolean of the deleted value.
+     */
+    public boolean isDeleted(){
+        return deleted;
+    }
+
+    /**
+     * Helper method to mark a user as deleted.
+     */
+    public void markAsDeleted() {
+        this.deleted = true;
+    }
+}
