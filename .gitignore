@@ -46,3 +46,4 @@ build/
 ### Security ###
 private_key.pem
 .env
+application-local.properties
