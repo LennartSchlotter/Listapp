@@ -50,10 +50,6 @@ public class Item {
     @Column(length = 100, nullable = false)
     private String title;
 
-    @Size(max = 2000)
-    @Column(columnDefinition = "text", length = 2000, nullable = true)
-    private String description;
-
     @Column(columnDefinition = "text", nullable = true)
     private String notes;
 

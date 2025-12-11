@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS list_items (
   list_id UUID NOT NULL REFERENCES lists(id) ON DELETE CASCADE,
   position INT NOT NULL DEFAULT 0,
   title VARCHAR(100) NOT NULL,
-  description TEXT,
   metadata TEXT,
   image_path VARCHAR(1024),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
