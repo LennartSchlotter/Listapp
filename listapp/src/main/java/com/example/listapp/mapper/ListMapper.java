@@ -19,7 +19,6 @@ public interface ListMapper {
     ListSummaryDto toSummaryDto(ListEntity entity);
     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "ownerId", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "items", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

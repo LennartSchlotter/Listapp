@@ -16,7 +16,6 @@ public interface ItemMapper {
     ItemSummaryDto toSummaryDto(Item entity);
     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "listId", ignore = true)
     @Mapping(target = "list", ignore = true)
     @Mapping(target = "position", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
