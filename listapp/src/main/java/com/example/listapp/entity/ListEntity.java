@@ -1,8 +1,8 @@
 package com.example.listapp.entity;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
@@ -63,7 +64,8 @@ public class ListEntity {
     
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "list_id", nullable = false)
-    private Set<Item> items = new HashSet<>();
+    @OrderBy("position ASC")
+    private List<Item> items = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean deleted = false;

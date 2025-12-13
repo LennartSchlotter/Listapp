@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -28,7 +29,9 @@ import lombok.Setter;
 @Setter
 @SQLRestriction("deleted = false")
 @Entity
-@Table(name="list_items")
+@Table(name="list_items", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"list_id", "position"})
+})
 public class Item {
     @Id 
     @GeneratedValue(strategy = GenerationType.UUID)
