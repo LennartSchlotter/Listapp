@@ -33,7 +33,7 @@ import lombok.Setter;
 @SQLRestriction("deleted = false")
 @Entity
 @Table(name="lists")
-public class List {
+public class ListEntity {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.UUID)

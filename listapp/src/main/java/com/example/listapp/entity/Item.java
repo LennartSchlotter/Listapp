@@ -40,7 +40,7 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "list_id", nullable = false)
-    private List list;
+    private ListEntity list;
 
     @Column(nullable = false)
     private Integer position;

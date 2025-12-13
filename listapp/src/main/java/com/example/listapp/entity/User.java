@@ -58,7 +58,7 @@ public class User {
     
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
-    private Set<List> lists = new HashSet<>();
+    private Set<ListEntity> lists = new HashSet<>();
     
     @CreationTimestamp
     @Column(name="created_at", nullable = false, updatable = false)

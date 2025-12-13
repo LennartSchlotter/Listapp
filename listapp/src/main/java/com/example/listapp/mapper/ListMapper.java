@@ -6,17 +6,17 @@ import org.mapstruct.Mapping;
 import com.example.listapp.dto.list.ListCreateDto;
 import com.example.listapp.dto.list.ListResponseDto;
 import com.example.listapp.dto.list.ListSummaryDto;
-import com.example.listapp.entity.List;
+import com.example.listapp.entity.ListEntity;
 
 @Mapper(componentModel = "spring", uses = {UserMapper.class, ItemMapper.class})
 public interface ListMapper {
 
     @Mapping(target = "owner", source = "owner")
     @Mapping(target = "items", source = "items")
-    ListResponseDto toResponseDto(List entity);
+    ListResponseDto toResponseDto(ListEntity entity);
     
     @Mapping(target = "itemCount", expression = "java(entity.getItems() != null ? entity.getItems().size() : 0)")
-    ListSummaryDto toSummaryDto(List entity);
+    ListSummaryDto toSummaryDto(ListEntity entity);
     
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "ownerId", ignore = true)
@@ -26,5 +26,5 @@ public interface ListMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "version", ignore = true)
-    List toEntity(ListCreateDto dto);
+    ListEntity toEntity(ListCreateDto dto);
 }
