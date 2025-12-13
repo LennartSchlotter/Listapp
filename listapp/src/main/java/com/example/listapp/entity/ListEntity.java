@@ -40,9 +40,6 @@ public class ListEntity {
     @Column(columnDefinition = "uuid", nullable = false)
     private UUID id;
 
-    @Column(name="owner_id", nullable = false, unique = false)
-    private UUID ownerId;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "owner_id", nullable = false, updatable = false)
     private User owner;

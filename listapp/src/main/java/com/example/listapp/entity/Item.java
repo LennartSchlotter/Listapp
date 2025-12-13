@@ -35,9 +35,6 @@ public class Item {
     @Column(columnDefinition = "uuid", nullable = false)
     private UUID id;
 
-    @Column(name="list_id", nullable = false)
-    private UUID listId;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "list_id", nullable = false)
     private ListEntity list;
