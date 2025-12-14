@@ -31,10 +31,4 @@ public interface ItemRepository extends JpaRepository<Item, UUID>{
      * @return an integer representing the amount of items.
      */
     long countByListId(UUID listId);
-    
-    /**
-     * Deletes all items for a specified list.
-     * @param listId ID of the list to delete all items for.
-     */
-    void deleteAllByListId(UUID listId);
 }

@@ -1,6 +1,7 @@
 package com.example.listapp.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,10 +18,10 @@ public interface ListRepository extends JpaRepository<ListEntity, UUID> {
     List<ListEntity> findAllByOwnerId(UUID ownerId);
 
     /**
-     * Additional check to ensure a user can only access their own lists.
+     * Method to return a specific list belonging to a specific user.
      * @param listId The ID of the list to perform the check for.
      * @param ownerId The ID of the user to perform the check for.
-     * @return a boolean value, representing whether or not the ID in question belongs to the user.
+     * @return a list with specified id, belonging to the specified user.
      */
-    boolean existsByIdAndOwnerId(UUID listId, UUID ownerId);
+    Optional<ListEntity> findByIdAndOwnerId(UUID listId, UUID ownerId);
 }
