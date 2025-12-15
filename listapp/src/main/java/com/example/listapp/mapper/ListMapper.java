@@ -8,7 +8,7 @@ import com.example.listapp.dto.list.ListResponseDto;
 import com.example.listapp.dto.list.ListSummaryDto;
 import com.example.listapp.entity.ListEntity;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, ItemMapper.class})
+@Mapper(componentModel = "spring", uses = {ItemMapper.class})
 public interface ListMapper {
 
     @Mapping(target = "owner", source = "owner")
