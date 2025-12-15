@@ -62,8 +62,7 @@ public class ListEntity {
     @Column(name="updated_at", nullable = false)
     private Instant updatedAt;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "list_id", nullable = false)
+    @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("position ASC")
     private List<Item> items = new ArrayList<>();
 
