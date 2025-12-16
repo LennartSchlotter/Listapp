@@ -1,0 +1,103 @@
+package com.example.listapp.service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.example.listapp.dto.item.ItemCreateDto;
+import com.example.listapp.dto.item.ItemReorderDto;
+import com.example.listapp.dto.item.ItemUpdateDto;
+import com.example.listapp.entity.Item;
+import com.example.listapp.entity.ListEntity;
+import com.example.listapp.mapper.ItemMapper;
+import com.example.listapp.repository.ItemRepository;
+import com.example.listapp.repository.ListRepository;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class ItemService {
+
+    private final ItemRepository _itemRepository;
+    private final ListRepository _listRepository;
+    private final ItemMapper _itemMapper;
+    
+    //TODO: here I only ever check for the id of the list, never for auth
+
+    public UUID createItem(UUID listId, ItemCreateDto dto) {
+        Item createdEntity = _itemMapper.toEntity(dto);
+        Item savedEntity = _itemRepository.save(createdEntity);
+        return savedEntity.getId();
+    }
+    
+    public UUID updateItem(UUID listId, UUID id, ItemUpdateDto dto) {
+        Item entityToUpdate = _itemRepository.findByIdAndListId(id, listId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with Id: " + id));
+        
+        dto.title().ifPresent(entityToUpdate::setTitle);
+        dto.notes().ifPresent(entityToUpdate::setNotes);
+        dto.imagePath().ifPresent(entityToUpdate::setImagePath);
+
+        _itemRepository.save(entityToUpdate);
+        return entityToUpdate.getId();
+    }
+    
+    public void reorderItems(UUID listId, ItemReorderDto dto) {
+        List<UUID> newOrder = dto.itemOrder();
+
+        if (newOrder == null || newOrder.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item order list cannot be empty");
+        }
+
+        ListEntity list = _listRepository.findById(listId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with Id: " + listId));
+
+        Set<UUID> currentItemIds = list.getItems().stream()
+            .map(Item::getId)
+            .collect(Collectors.toSet());
+
+        Set<UUID> requestedItemIds = new HashSet<>(newOrder);
+
+        if (!currentItemIds.equals(requestedItemIds)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                "Provided item order does not match the current items in the list");
+        }
+
+        List<Item> items = _itemRepository.findAllByListIdOrderByPositionAsc(listId);
+
+        Map<UUID, Item> itemById = items.stream()
+            .collect(Collectors.toMap(Item::getId, Function.identity()));
+
+        for (int newPosition = 0; newPosition < newOrder.size(); newPosition++){
+            UUID itemId = newOrder.get(newPosition);
+            Item item = itemById.get(itemId);
+
+            if (item == null){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid item ID in reorder request");
+            }
+
+            item.setPosition(newPosition);
+        }
+
+        _itemRepository.saveAll(items);
+    }
+    
+    public void deleteItem(UUID listId, UUID id) {
+        Item entity = _itemRepository.findByIdAndListId(id, listId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Item found with id: " + id));
+        
+        entity.markAsDeleted();
+        _itemRepository.save(entity);
+    }
+}
