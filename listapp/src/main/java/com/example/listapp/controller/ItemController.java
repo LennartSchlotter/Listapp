@@ -3,6 +3,7 @@ package com.example.listapp.controller;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ public class ItemController {
     }
 
     @PostMapping
+    @PreAuthorize("@itemSecurity.canAccessList(#listId)")
     public ResponseEntity<UUID> CreateItem(@PathVariable UUID listId, @Valid @RequestBody ItemCreateDto dto){
         UUID createdId = _itemService.createItem(listId, dto);
         return ResponseEntity.ok(createdId);
@@ -37,6 +39,7 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     @ResponseBody
+    @PreAuthorize("@itemSecurity.canAccessItem(#listId, #id)")
     public ResponseEntity<UUID> UpdateItem(@PathVariable UUID listId, @PathVariable UUID id, @Valid @RequestBody ItemUpdateDto dto){
         UUID updatedId = _itemService.updateItem(listId, id, dto);
         return ResponseEntity.ok(updatedId);
@@ -44,6 +47,7 @@ public class ItemController {
 
     @PatchMapping("/order")
     @ResponseBody
+    @PreAuthorize("@itemSecurity.canAccessList(#listId)")
     public ResponseEntity<Void> ReorderItems(@PathVariable UUID listId, @Valid @RequestBody ItemReorderDto dto){
         _itemService.reorderItems(listId, dto);
         return ResponseEntity.noContent().build();
@@ -51,6 +55,7 @@ public class ItemController {
 
     @DeleteMapping("/{id}")
     @ResponseBody
+    @PreAuthorize("@itemSecurity.canAccessItem(#listId, #id)")
     public ResponseEntity<Void> DeleteItem(@PathVariable UUID listId, @PathVariable UUID id){
         _itemService.deleteItem(listId, id);
         return ResponseEntity.noContent().build();

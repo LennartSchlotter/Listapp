@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,30 +27,22 @@ public class UserController {
         _userService = userService;
     }
 
-    @PostMapping
-    @ResponseBody
-    public ResponseEntity<UUID> CreateUser(){
-        //TODO: Not sure yet if I'll need this. Higher level auth plan
-        //UUID createdId = _userService.createUser();
-        //return ResponseEntity.ok(createdId);
-        return null;
-    }
-
     @GetMapping
     @ResponseBody
     public ResponseEntity<UserResponseDto> GetUser(){
+
         UserResponseDto response = _userService.getUser();
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping
     @ResponseBody
     public ResponseEntity<UUID> UpdateUser(@Valid @RequestBody UserUpdateDto dto){
         UUID updatedId = _userService.updateUser(dto);
         return ResponseEntity.ok(updatedId);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     @ResponseBody
     public ResponseEntity<Void> DeleteUser(){
         _userService.deleteUser();

@@ -32,11 +32,14 @@ public class ItemService {
     private final ItemRepository _itemRepository;
     private final ListRepository _listRepository;
     private final ItemMapper _itemMapper;
-    
-    //TODO: here I only ever check for the id of the list, never for auth
 
     public UUID createItem(UUID listId, ItemCreateDto dto) {
+        ListEntity list = _listRepository.findById(listId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found"));
+
         Item createdEntity = _itemMapper.toEntity(dto);
+        createdEntity.setList(list);
+
         Item savedEntity = _itemRepository.save(createdEntity);
         return savedEntity.getId();
     }

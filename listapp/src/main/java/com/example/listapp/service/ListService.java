@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -12,8 +13,10 @@ import com.example.listapp.dto.list.ListCreateDto;
 import com.example.listapp.dto.list.ListResponseDto;
 import com.example.listapp.dto.list.ListUpdateDto;
 import com.example.listapp.entity.ListEntity;
+import com.example.listapp.entity.User;
 import com.example.listapp.mapper.ListMapper;
 import com.example.listapp.repository.ListRepository;
+import com.example.listapp.security.CustomOAuth2User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,8 +28,7 @@ public class ListService {
     private final ListMapper _listMapper;
     
     public List<ListResponseDto> getAllUserLists() {
-        UUID ownerId = null;
-        //TODO get ownerId from auth
+        UUID ownerId = getCurrentUser().getId();
         List<ListEntity> entityList = _listRepository.findAllByOwnerId(ownerId);
 
         List<ListResponseDto> dtoList = entityList.stream()
@@ -37,9 +39,7 @@ public class ListService {
     }
 
     public ListResponseDto getListById(UUID id) {
-        UUID ownerId = null;
-        //TODO get ownerId from auth
-        ListEntity entity = _listRepository.findByIdAndOwnerId(id, ownerId)
+        ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
         ListResponseDto response = _listMapper.toResponseDto(entity);
         
@@ -48,14 +48,16 @@ public class ListService {
 
     public UUID createList(ListCreateDto dto) {
         ListEntity entity = _listMapper.toEntity(dto);
+
+        User currentUser = getCurrentUser();
+        entity.setOwner(currentUser);
+
         ListEntity savedEntity =_listRepository.save(entity);
         return savedEntity.getId();
     }
 
     public UUID updateList(UUID id, ListUpdateDto dto) {
-        UUID ownerId = null;
-        //TODO get ownerId from auth
-        ListEntity entityToUpdate = _listRepository.findByIdAndOwnerId(id, ownerId)
+        ListEntity entityToUpdate = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
         
         dto.title().ifPresent(entityToUpdate::setTitle);
@@ -66,12 +68,18 @@ public class ListService {
     }
 
     public void deleteList(UUID id) {
-        UUID ownerId = null;
-        //TODO get ownerId from auth
-        ListEntity entity = _listRepository.findByIdAndOwnerId(id, ownerId)
+        ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
         
         entity.markAsDeleted();
         _listRepository.save(entity);
+    }
+
+    private User getCurrentUser() {
+        CustomOAuth2User principal = (CustomOAuth2User) SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getPrincipal();
+        return principal.getUser();
     }
 }
