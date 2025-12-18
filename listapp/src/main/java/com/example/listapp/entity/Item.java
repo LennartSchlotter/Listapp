@@ -50,7 +50,7 @@ public class Item {
     @Column(length = 100, nullable = false)
     private String title;
 
-    @Column(columnDefinition = "text", nullable = true)
+    @Column(name = "metadata", columnDefinition = "text", nullable = true)
     private String notes;
 
     @Size(max = 1024)
