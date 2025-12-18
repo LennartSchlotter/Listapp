@@ -29,13 +29,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable()) //!remove in prod!
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                     "/",
                     "/login",
                     "/oauth2/**",
                     "/error",
-                    "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/swagger-resources/**",
                     "/webjars/**"
@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfo -> userInfo
                     .userService(_authenticationService)
                 )
-                .defaultSuccessUrl("/dashboard", true)
+                .defaultSuccessUrl("/swagger-ui/index.html", true)
             )
             .logout(logout -> logout
                 .logoutSuccessUrl("/")
