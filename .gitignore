@@ -44,6 +44,6 @@ build/
 .vscode/
 
 ### Security ###
-private_key.pem
 .env
 application-local.properties
+flyway.conf

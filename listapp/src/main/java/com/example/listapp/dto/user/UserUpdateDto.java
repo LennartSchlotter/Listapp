@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
 public record UserUpdateDto(
-    Optional<String> oauth2_provider,
+    Optional<String> oauth2Provider,
     Optional<@Size(max = 64) String> name,
     Optional<@Email @Size(max = 255) String> email
 ){}

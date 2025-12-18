@@ -39,8 +39,8 @@ public class AuthenticationService extends DefaultOAuth2UserService {
             })
             .orElseGet(() -> {
                 User newUser = new User();
-                newUser.setOauth2_provider(provider);
-                newUser.setOauth2_sub(sub);
+                newUser.setOauth2Provider(provider);
+                newUser.setOauth2Sub(sub);
                 newUser.setEmail(email);
                 newUser.setName(name);
                 return _userRepository.save(newUser);

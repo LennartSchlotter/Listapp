@@ -39,10 +39,11 @@ public class User {
     @Column(columnDefinition = "uuid", nullable = false)
     private UUID id;
     
-    private String oauth2_provider;
+    @Column(name = "oauth2_provider", nullable = false)
+    private String oauth2Provider;
 
-    @Column(nullable = false)
-    private String oauth2_sub;
+    @Column(name = "oauth2_sub", nullable = false)
+    private String oauth2Sub;
 
     @NotBlank(message = "Name is required")
     @Size(max = 64)
