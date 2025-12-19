@@ -13,6 +13,7 @@ import com.example.listapp.mapper.UserMapper;
 import com.example.listapp.repository.UserRepository;
 import com.example.listapp.security.CustomOAuth2User;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -45,8 +46,10 @@ public class UserService {
     public void deleteUser() {
         User entity = getCurrentUser();
         
-        entity.markAsDeleted();
-        _userRepository.save(entity);
+        entity = _userRepository.findById(entity.getId())
+        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        _userRepository.delete(entity);
     }
 
     private User getCurrentUser() {

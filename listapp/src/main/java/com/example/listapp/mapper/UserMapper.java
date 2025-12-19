@@ -20,7 +20,6 @@ public interface UserMapper {
     @Mapping(target = "lists", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "version", ignore = true)
     User toEntity(UserCreateDto dto);
 }

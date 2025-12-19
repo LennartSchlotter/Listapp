@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
@@ -29,7 +28,6 @@ import lombok.Setter;
 @DynamicUpdate
 @Getter
 @Setter
-@SQLRestriction("deleted = false")
 @Entity
 @Table(name="users")
 public class User {
@@ -67,24 +65,6 @@ public class User {
     @Column(name="updated_at", nullable = false)
     private Instant updatedAt;
 
-    @Column(nullable = false)
-    private boolean deleted = false;
-
     @Version
     private Long version;
-
-    /**
-     * Helper method to determine the deletion state of a user.
-     * @return a boolean of the deleted value.
-     */
-    public boolean isDeleted(){
-        return deleted;
-    }
-
-    /**
-     * Helper method to mark a user as deleted.
-     */
-    public void markAsDeleted() {
-        this.deleted = true;
-    }
 }
