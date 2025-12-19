@@ -40,6 +40,9 @@ public class ItemService {
         Item createdEntity = _itemMapper.toEntity(dto);
         createdEntity.setList(list);
 
+        int nextPosition = Math.max(0, (int) _itemRepository.countByListId(listId));
+        createdEntity.setPosition(nextPosition);
+
         Item savedEntity = _itemRepository.save(createdEntity);
         return savedEntity.getId();
     }
@@ -104,5 +107,20 @@ public class ItemService {
         
         entity.markAsDeleted();
         _itemRepository.save(entity);
+
+        List<Item> remainingItems = _itemRepository.findAllByListIdOrderByPositionAsc(listId);
+        for (int i = 0; i < remainingItems.size(); i++){
+            Item item = remainingItems.get(i);
+            if (item.getPosition() != i){
+                item.setPosition(i);
+            }
+        }
+
+        if (!remainingItems.isEmpty()) {
+            _itemRepository.saveAll(remainingItems.stream()
+                .filter(item -> item.getPosition() != remainingItems.indexOf(item))
+                .toList());
+        }
+
     }
 }
