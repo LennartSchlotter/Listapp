@@ -25,6 +25,12 @@ public class SecurityConfig {
         _authenticationService = authenticationService;
     }
 
+    /**
+     * Defines the security filter chain for the application.
+     * @param http The HttpSecurity configuration builder.
+     * @return the configured SecurityFilterChain
+     * @throws Exception if configuration fails.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -56,6 +62,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Provides the CORS configuration source.
+     * @return the UrlBasedCorsConfigurationSource with applied configuration.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

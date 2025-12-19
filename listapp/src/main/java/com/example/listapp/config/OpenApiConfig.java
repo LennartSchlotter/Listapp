@@ -8,6 +8,10 @@ import io.swagger.v3.oas.models.info.Info;
 @Configuration
 public class OpenApiConfig {
     
+    /**
+     * Configures the custom OpenAPI definition for the application.
+     * @return the customized OpenAPI instance.
+     */
     @Bean
     public OpenAPI customOpenAPI(){
         return new OpenAPI()

@@ -23,11 +23,11 @@ public class UserService {
     private final UserRepository _userRepository;
     private final UserMapper _userMapper;
     
-    @Transactional(readOnly = true)
     /**
      * Retrieves the currently authenticated user.
      * @return the currently authenticated user.
      */
+    @Transactional(readOnly = true)
     public UserResponseDto getUser() {
         User user = getCurrentUser();
         
@@ -35,12 +35,12 @@ public class UserService {
         return response;
     }
     
-    @Transactional
     /**
      * Updates the currently authenticated user.
      * @param dto The to be changed values of the user.
      * @return The ID of the updated User.
      */
+    @Transactional
     public UUID updateUser(UserUpdateDto dto) {
         User entityToUpdate = getCurrentUser();
         
@@ -51,10 +51,10 @@ public class UserService {
         return entityToUpdate.getId();
     }
     
-    @Transactional
     /**
      * Deletes the currently authenticated user.
      */
+    @Transactional
     public void deleteUser() {
         User entity = getCurrentUser();
         

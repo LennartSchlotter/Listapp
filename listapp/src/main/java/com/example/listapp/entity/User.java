@@ -25,14 +25,14 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Database table definition for a User.
+ */
 @DynamicUpdate
 @Getter
 @Setter
 @Entity
 @Table(name="users")
-/**
- * Database table definition for a User.
- */
 public class User {
 
     @Id 

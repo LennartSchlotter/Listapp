@@ -28,15 +28,15 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Database table definition for a List.
+ */
 @DynamicUpdate
 @Getter
 @Setter
 @SQLRestriction("deleted = false")
 @Entity
 @Table(name="lists")
-/**
- * Database table definition for a List.
- */
 public class ListEntity {
 
     @Id 

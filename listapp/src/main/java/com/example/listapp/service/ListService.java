@@ -28,11 +28,11 @@ public class ListService {
     private final ListRepository _listRepository;
     private final ListMapper _listMapper;
     
-    @Transactional(readOnly = true)
     /**
      * Retrieves all lists associated with the authenticated user.
      * @return a list of lists.
      */
+    @Transactional(readOnly = true)
     public List<ListResponseDto> getAllUserLists() {
         UUID ownerId = getCurrentUser().getId();
         List<ListEntity> entityList = _listRepository.findAllByOwnerId(ownerId);
@@ -44,12 +44,12 @@ public class ListService {
         return dtoList;
     }
 
-    @Transactional(readOnly = true)
     /**
      * Retrieves a specific list.
      * @param id The ID of the list to be retrieved.
      * @return The List with the specified ID.
      */
+    @Transactional(readOnly = true)
     public ListResponseDto getListById(UUID id) {
         ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
@@ -58,12 +58,12 @@ public class ListService {
         return response;
     }
 
-    @Transactional
     /**
      * Creates a list.
      * @param dto The list to be created.
      * @return The ID of the created list.
      */
+    @Transactional
     public UUID createList(ListCreateDto dto) {
         ListEntity entity = _listMapper.toEntity(dto);
 
@@ -74,13 +74,13 @@ public class ListService {
         return savedEntity.getId();
     }
 
-    @Transactional
     /**
      * Updates a list.
      * @param id The ID of the list to update.
      * @param dto The to be changed values of the list.
      * @return The ID of the updated list.
      */
+    @Transactional
     public UUID updateList(UUID id, ListUpdateDto dto) {
         ListEntity entityToUpdate = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
@@ -92,11 +92,11 @@ public class ListService {
         return entityToUpdate.getId();
     }
 
-    @Transactional
     /**
      * Deletes a list.
      * @param id The ID of the list to delete.
      */
+    @Transactional
     public void deleteList(UUID id) {
         ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
