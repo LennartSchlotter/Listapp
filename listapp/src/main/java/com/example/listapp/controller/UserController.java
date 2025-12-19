@@ -2,6 +2,7 @@ package com.example.listapp.controller;
 
 import java.util.UUID;
 
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +15,18 @@ import com.example.listapp.dto.user.UserResponseDto;
 import com.example.listapp.dto.user.UserUpdateDto;
 import com.example.listapp.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@Tag(name = "User Controller", description = "APIs for managing authenticated users")
 public class UserController {
 
     private final UserService _userService;
@@ -27,6 +35,12 @@ public class UserController {
         _userService = userService;
     }
 
+    @Operation(summary = "Get current user", description = "Retrieve details of the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User retrieved successfully",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UserResponseDto.class)))
+    })
     @GetMapping
     @ResponseBody
     public ResponseEntity<UserResponseDto> GetUser(){
@@ -35,6 +49,15 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update current user", description = "Update details of the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User updated successfully",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UUID.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid request data",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ProblemDetail.class)))
+    })
     @PatchMapping
     @ResponseBody
     public ResponseEntity<UUID> UpdateUser(@Valid @RequestBody UserUpdateDto dto){
@@ -42,6 +65,10 @@ public class UserController {
         return ResponseEntity.ok(updatedId);
     }
 
+    @Operation(summary = "Delete current user", description = "Deletes the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "User account deleted successfully")
+    })
     @DeleteMapping
     @ResponseBody
     public ResponseEntity<Void> DeleteUser(){
