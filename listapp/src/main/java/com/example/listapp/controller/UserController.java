@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -71,8 +74,9 @@ public class UserController {
     })
     @DeleteMapping
     @ResponseBody
-    public ResponseEntity<Void> DeleteUser(){
+    public ResponseEntity<Void> DeleteUser(HttpServletRequest request, HttpServletResponse response){
         _userService.deleteUser();
+        new SecurityContextLogoutHandler().logout(request, response, null);
         return ResponseEntity.noContent().build();
     }
 }
