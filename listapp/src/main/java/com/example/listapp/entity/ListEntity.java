@@ -34,6 +34,9 @@ import lombok.Setter;
 @SQLRestriction("deleted = false")
 @Entity
 @Table(name="lists")
+/**
+ * Database table definition for a List.
+ */
 public class ListEntity {
 
     @Id 

@@ -30,6 +30,9 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name="users")
+/**
+ * Database table definition for a User.
+ */
 public class User {
 
     @Id 

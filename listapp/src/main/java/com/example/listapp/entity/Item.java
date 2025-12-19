@@ -32,6 +32,9 @@ import lombok.Setter;
 @Table(name="list_items", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"list_id", "position"})
 })
+/**
+ * Database table definition for an Item.
+ */
 public class Item {
     @Id 
     @GeneratedValue(strategy = GenerationType.UUID)
