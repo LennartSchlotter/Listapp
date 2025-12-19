@@ -24,6 +24,10 @@ public class UserService {
     private final UserMapper _userMapper;
     
     @Transactional(readOnly = true)
+    /**
+     * Retrieves the currently authenticated user.
+     * @return the currently authenticated user.
+     */
     public UserResponseDto getUser() {
         User user = getCurrentUser();
         
@@ -32,6 +36,11 @@ public class UserService {
     }
     
     @Transactional
+    /**
+     * Updates the currently authenticated user.
+     * @param dto The to be changed values of the user.
+     * @return The ID of the updated User.
+     */
     public UUID updateUser(UserUpdateDto dto) {
         User entityToUpdate = getCurrentUser();
         
@@ -43,6 +52,9 @@ public class UserService {
     }
     
     @Transactional
+    /**
+     * Deletes the currently authenticated user.
+     */
     public void deleteUser() {
         User entity = getCurrentUser();
         

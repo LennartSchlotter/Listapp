@@ -29,6 +29,10 @@ public class ListService {
     private final ListMapper _listMapper;
     
     @Transactional(readOnly = true)
+    /**
+     * Retrieves all lists associated with the authenticated user.
+     * @return a list of lists.
+     */
     public List<ListResponseDto> getAllUserLists() {
         UUID ownerId = getCurrentUser().getId();
         List<ListEntity> entityList = _listRepository.findAllByOwnerId(ownerId);
@@ -41,6 +45,11 @@ public class ListService {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Retrieves a specific list.
+     * @param id The ID of the list to be retrieved.
+     * @return The List with the specified ID.
+     */
     public ListResponseDto getListById(UUID id) {
         ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
@@ -50,6 +59,11 @@ public class ListService {
     }
 
     @Transactional
+    /**
+     * Creates a list.
+     * @param dto The list to be created.
+     * @return The ID of the created list.
+     */
     public UUID createList(ListCreateDto dto) {
         ListEntity entity = _listMapper.toEntity(dto);
 
@@ -61,6 +75,12 @@ public class ListService {
     }
 
     @Transactional
+    /**
+     * Updates a list.
+     * @param id The ID of the list to update.
+     * @param dto The to be changed values of the list.
+     * @return The ID of the updated list.
+     */
     public UUID updateList(UUID id, ListUpdateDto dto) {
         ListEntity entityToUpdate = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
@@ -73,6 +93,10 @@ public class ListService {
     }
 
     @Transactional
+    /**
+     * Deletes a list.
+     * @param id The ID of the list to delete.
+     */
     public void deleteList(UUID id) {
         ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));

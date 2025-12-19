@@ -20,12 +20,23 @@ public class ItemSecurityService {
         _listRepository = listRepository;
     }
 
+    /**
+     * Helper method to determine whether a user can access a specific item.
+     * @param listId The ID of the list the item to be retrieved belongs to.
+     * @param itemId The ID of the item to perform the check for.
+     * @return a boolean representing whether or not the currently authenticated user can access the requested item.
+     */
     public boolean canAccessItem(UUID listId, UUID itemId) {
         User currentUser = getCurrentUser();
         return (_itemRepository.findByIdAndListId(itemId, listId) != null) 
             && (_listRepository.findByIdAndOwnerId(listId, currentUser.getId()) != null);
     }
 
+    /**
+     * Helper method to determine whether a user can access a specific list.
+     * @param listId The ID of the list to perform the check for.
+     * @return a boolean representing whether or not the currently authenticated user can access the requested list.
+     */
     public boolean canAccessList(UUID listId) {
         User currentUser = getCurrentUser();
         return (_listRepository.findByIdAndOwnerId(listId, currentUser.getId()) != null);

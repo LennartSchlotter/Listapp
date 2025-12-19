@@ -17,6 +17,11 @@ public class ListSecurityService {
         _listRepository = listRepository;
     }
 
+    /**
+     * Helper method to determine whether the currently authenticated user owns a specified list.
+     * @param listId The ID of the list to perform the check for.
+     * @return a boolean representing whether or not the currently authenticated user is the owner of the requested list.
+     */
     public boolean isOwner(UUID listId){
         User currentUser = getCurrentUser();
         return (_listRepository.findByIdAndOwnerId(listId, currentUser.getId()) != null);

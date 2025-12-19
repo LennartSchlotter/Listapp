@@ -33,6 +33,12 @@ public class ItemService {
     private final ItemMapper _itemMapper;
 
     @Transactional
+    /**
+     * Creates a new item.
+     * @param listId The ID of the list to create an item for.
+     * @param dto The item to be created.
+     * @return The ID of the created item.
+     */
     public UUID createItem(UUID listId, ItemCreateDto dto) {
         ListEntity list = _listRepository.findById(listId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found"));
@@ -47,6 +53,14 @@ public class ItemService {
         return savedEntity.getId();
     }
     
+    @Transactional
+    /**
+     * Updates an existing item.
+     * @param listId The ID of the list the item to be updated is associated to.
+     * @param id The ID of the item to update.
+     * @param dto The to be changed values of the item.
+     * @return The ID of the updated item.
+     */
     public UUID updateItem(UUID listId, UUID id, ItemUpdateDto dto) {
         Item entityToUpdate = _itemRepository.findByIdAndListId(id, listId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with Id: " + id));
@@ -60,6 +74,11 @@ public class ItemService {
     }
     
     @Transactional
+    /**
+     * Updates the order of items.
+     * @param listId The ID of the list to perform reordering for.
+     * @param dto The changed order.
+     */
     public void reorderItems(UUID listId, ItemReorderDto dto) {
         List<UUID> newOrder = dto.itemOrder();
 
@@ -86,6 +105,7 @@ public class ItemService {
         Map<UUID, Item> itemById = items.stream()
             .collect(Collectors.toMap(Item::getId, Function.identity()));
 
+        // Iterate through the list, changing position values as by the requested order
         for (int newPosition = 0; newPosition < newOrder.size(); newPosition++){
             UUID itemId = newOrder.get(newPosition);
             Item item = itemById.get(itemId);
@@ -101,6 +121,11 @@ public class ItemService {
     }
     
     @Transactional
+    /**
+     * Deletes an item.
+     * @param listId The ID of the list the item to be deleted is associated to.
+     * @param id The ID of teh item to be deleted.
+     */
     public void deleteItem(UUID listId, UUID id) {
         Item entity = _itemRepository.findByIdAndListId(id, listId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Item found with id: " + id));

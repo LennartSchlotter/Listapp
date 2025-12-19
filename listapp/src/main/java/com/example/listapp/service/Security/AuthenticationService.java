@@ -31,6 +31,7 @@ public class AuthenticationService extends DefaultOAuth2UserService {
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
 
+        // Create or update the user based on the OAuth data.
         User user = _userRepository.findByOauth2ProviderAndOauth2Sub(provider, sub)
             .map(existingUser -> {
                 existingUser.setName(name);
