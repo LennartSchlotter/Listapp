@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.listapp.dto.item.ItemCreateDto;
@@ -21,18 +22,17 @@ import com.example.listapp.mapper.ItemMapper;
 import com.example.listapp.repository.ItemRepository;
 import com.example.listapp.repository.ListRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItemService {
 
     private final ItemRepository _itemRepository;
     private final ListRepository _listRepository;
     private final ItemMapper _itemMapper;
 
+    @Transactional
     public UUID createItem(UUID listId, ItemCreateDto dto) {
         ListEntity list = _listRepository.findById(listId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found"));
@@ -56,6 +56,7 @@ public class ItemService {
         return entityToUpdate.getId();
     }
     
+    @Transactional
     public void reorderItems(UUID listId, ItemReorderDto dto) {
         List<UUID> newOrder = dto.itemOrder();
 
@@ -96,6 +97,7 @@ public class ItemService {
         _itemRepository.saveAll(items);
     }
     
+    @Transactional
     public void deleteItem(UUID listId, UUID id) {
         Item entity = _itemRepository.findByIdAndListId(id, listId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Item found with id: " + id));

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.listapp.dto.user.UserResponseDto;
 import com.example.listapp.dto.user.UserUpdateDto;
@@ -21,6 +22,7 @@ public class UserService {
     private final UserRepository _userRepository;
     private final UserMapper _userMapper;
     
+    @Transactional(readOnly = true)
     public UserResponseDto getUser() {
         User user = getCurrentUser();
         
@@ -28,6 +30,7 @@ public class UserService {
         return response;
     }
     
+    @Transactional
     public UUID updateUser(UserUpdateDto dto) {
         User entityToUpdate = getCurrentUser();
         
@@ -38,6 +41,7 @@ public class UserService {
         return entityToUpdate.getId();
     }
     
+    @Transactional
     public void deleteUser() {
         User entity = getCurrentUser();
         

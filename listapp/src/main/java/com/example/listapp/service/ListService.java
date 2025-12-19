@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.listapp.dto.list.ListCreateDto;
@@ -27,6 +28,7 @@ public class ListService {
     private final ListRepository _listRepository;
     private final ListMapper _listMapper;
     
+    @Transactional(readOnly = true)
     public List<ListResponseDto> getAllUserLists() {
         UUID ownerId = getCurrentUser().getId();
         List<ListEntity> entityList = _listRepository.findAllByOwnerId(ownerId);
@@ -38,6 +40,7 @@ public class ListService {
         return dtoList;
     }
 
+    @Transactional(readOnly = true)
     public ListResponseDto getListById(UUID id) {
         ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
@@ -46,6 +49,7 @@ public class ListService {
         return response;
     }
 
+    @Transactional
     public UUID createList(ListCreateDto dto) {
         ListEntity entity = _listMapper.toEntity(dto);
 
@@ -56,6 +60,7 @@ public class ListService {
         return savedEntity.getId();
     }
 
+    @Transactional
     public UUID updateList(UUID id, ListUpdateDto dto) {
         ListEntity entityToUpdate = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
@@ -67,6 +72,7 @@ public class ListService {
         return entityToUpdate.getId();
     }
 
+    @Transactional
     public void deleteList(UUID id) {
         ListEntity entity = _listRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
