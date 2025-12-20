@@ -4,25 +4,27 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.listapp.dto.list.ListCreateDto;
 import com.example.listapp.dto.list.ListResponseDto;
 import com.example.listapp.dto.list.ListUpdateDto;
 import com.example.listapp.entity.ListEntity;
 import com.example.listapp.entity.User;
+import com.example.listapp.exception.custom.AccessDeniedException;
+import com.example.listapp.exception.custom.ResourceNotFoundException;
 import com.example.listapp.mapper.ListMapper;
 import com.example.listapp.repository.ListRepository;
 import com.example.listapp.security.CustomOAuth2User;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ListService {
 
     private final ListRepository _listRepository;
@@ -52,7 +54,10 @@ public class ListService {
     @Transactional(readOnly = true)
     public ListResponseDto getListById(UUID id) {
         ListEntity entity = _listRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("List", id.toString()));
+
+        validateOwnership(entity);
+
         ListResponseDto response = _listMapper.toResponseDto(entity);
         
         return response;
@@ -71,6 +76,8 @@ public class ListService {
         entity.setOwner(currentUser);
 
         ListEntity savedEntity =_listRepository.save(entity);
+        log.info("Created list with id: {} for user: {}", savedEntity.getId(), currentUser.getId());
+
         return savedEntity.getId();
     }
 
@@ -83,12 +90,16 @@ public class ListService {
     @Transactional
     public UUID updateList(UUID id, ListUpdateDto dto) {
         ListEntity entityToUpdate = _listRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("List", id.toString()));
         
+        validateOwnership(entityToUpdate);
+
         dto.title().ifPresent(entityToUpdate::setTitle);
         dto.description().ifPresent(entityToUpdate::setDescription);
 
         _listRepository.save(entityToUpdate);
+        log.info("Updated list with id: {}", id);
+
         return entityToUpdate.getId();
     }
 
@@ -99,10 +110,22 @@ public class ListService {
     @Transactional
     public void deleteList(UUID id) {
         ListEntity entity = _listRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("List", id.toString()));
         
+        validateOwnership(entity);
+
         entity.markAsDeleted();
         _listRepository.save(entity);
+        log.info("Soft deleted list with id: {}", id);
+    }
+
+    private void validateOwnership(ListEntity entity) {
+        User currentUser = getCurrentUser();
+        if (!entity.getOwner().getId().equals(currentUser.getId())) {
+            log.warn("User {} attempted to access list {} owned by user {}", 
+                currentUser.getId(), entity.getId(), entity.getOwner().getId());
+            throw new AccessDeniedException("You don't have permission to access this list");
+        }
     }
 
     private User getCurrentUser() {

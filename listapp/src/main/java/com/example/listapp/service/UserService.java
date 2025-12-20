@@ -9,15 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.listapp.dto.user.UserResponseDto;
 import com.example.listapp.dto.user.UserUpdateDto;
 import com.example.listapp.entity.User;
+import com.example.listapp.exception.custom.ResourceNotFoundException;
 import com.example.listapp.mapper.UserMapper;
 import com.example.listapp.repository.UserRepository;
 import com.example.listapp.security.CustomOAuth2User;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     
     private final UserRepository _userRepository;
@@ -48,6 +50,8 @@ public class UserService {
         dto.email().ifPresent(entityToUpdate::setEmail);
 
         _userRepository.save(entityToUpdate);
+        log.info("Updated user with id: {}", entityToUpdate.getId());
+
         return entityToUpdate.getId();
     }
     
@@ -58,10 +62,11 @@ public class UserService {
     public void deleteUser() {
         User entity = getCurrentUser();
         
-        entity = _userRepository.findById(entity.getId())
-        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User userToDelete = _userRepository.findById(entity.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("User", entity.getId().toString()));
 
-        _userRepository.delete(entity);
+        _userRepository.delete(userToDelete);
+        log.info("Deleted user with id: {}", userToDelete.getId());
     }
 
     private User getCurrentUser() {

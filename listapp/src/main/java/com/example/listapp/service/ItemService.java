@@ -8,24 +8,26 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.listapp.dto.item.ItemCreateDto;
 import com.example.listapp.dto.item.ItemReorderDto;
 import com.example.listapp.dto.item.ItemUpdateDto;
 import com.example.listapp.entity.Item;
 import com.example.listapp.entity.ListEntity;
+import com.example.listapp.exception.custom.InvalidInputException;
+import com.example.listapp.exception.custom.ResourceNotFoundException;
 import com.example.listapp.mapper.ItemMapper;
 import com.example.listapp.repository.ItemRepository;
 import com.example.listapp.repository.ListRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemService {
 
     private final ItemRepository _itemRepository;
@@ -41,7 +43,7 @@ public class ItemService {
     @Transactional
     public UUID createItem(UUID listId, ItemCreateDto dto) {
         ListEntity list = _listRepository.findById(listId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("List", listId.toString()));
 
         Item createdEntity = _itemMapper.toEntity(dto);
         createdEntity.setList(list);
@@ -50,6 +52,8 @@ public class ItemService {
         createdEntity.setPosition(nextPosition);
 
         Item savedEntity = _itemRepository.save(createdEntity);
+        log.info("Created item with id: {} in list: {}", savedEntity.getId(), listId);
+
         return savedEntity.getId();
     }
     
@@ -63,13 +67,15 @@ public class ItemService {
     @Transactional
     public UUID updateItem(UUID listId, UUID id, ItemUpdateDto dto) {
         Item entityToUpdate = _itemRepository.findByIdAndListId(id, listId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with Id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Item", id.toString()));
         
         dto.title().ifPresent(entityToUpdate::setTitle);
         dto.notes().ifPresent(entityToUpdate::setNotes);
         dto.imagePath().ifPresent(entityToUpdate::setImagePath);
 
         _itemRepository.save(entityToUpdate);
+        log.info("Updated item with id: {} in list: {}", id, listId);
+
         return entityToUpdate.getId();
     }
     
@@ -83,11 +89,11 @@ public class ItemService {
         List<UUID> newOrder = dto.itemOrder();
 
         if (newOrder == null || newOrder.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item order list cannot be empty");
+            throw new InvalidInputException("Item order list cannot be empty");
         }
 
         ListEntity list = _listRepository.findById(listId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "List not found with Id: " + listId));
+            .orElseThrow(() -> new ResourceNotFoundException("List", listId.toString()));
 
         Set<UUID> currentItemIds = list.getItems().stream()
             .map(Item::getId)
@@ -96,8 +102,13 @@ public class ItemService {
         Set<UUID> requestedItemIds = new HashSet<>(newOrder);
 
         if (!currentItemIds.equals(requestedItemIds)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
-                "Provided item order does not match the current items in the list");
+            log.warn("Item order mismatch for list {}. Current: {}, Requested: {}", 
+                listId, currentItemIds, requestedItemIds);
+            throw new InvalidInputException("Provided item order does not match the current items in the list");
+        }
+
+        if (newOrder.size() != requestedItemIds.size()) {
+            throw new InvalidInputException("Item order contains duplicate IDs");
         }
 
         List<Item> items = _itemRepository.findAllByListIdOrderByPositionAsc(listId);
@@ -111,13 +122,14 @@ public class ItemService {
             Item item = itemById.get(itemId);
 
             if (item == null){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid item ID in reorder request");
+                throw new InvalidInputException(String.format("Invalid item ID in reorder request: %s", itemId));
             }
 
             item.setPosition(newPosition);
         }
 
         _itemRepository.saveAll(items);
+        log.info("Reordered {} items in list: {}", items.size(), listId);
     }
     
     /**
@@ -128,7 +140,7 @@ public class ItemService {
     @Transactional
     public void deleteItem(UUID listId, UUID id) {
         Item entity = _itemRepository.findByIdAndListId(id, listId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No Item found with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Item", id.toString()));
         
         entity.markAsDeleted();
         _itemRepository.save(entity);
@@ -147,5 +159,6 @@ public class ItemService {
                 .toList());
         }
 
+        log.info("Deleted items with id: {} from list: {}", id, listId);
     }
 }
