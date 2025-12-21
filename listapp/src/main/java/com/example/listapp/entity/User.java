@@ -37,7 +37,7 @@ public class User {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uuid", nullable = false)
+    @Column(nullable = false)
     private UUID id;
     
     @Column(name = "oauth2_provider", nullable = false)

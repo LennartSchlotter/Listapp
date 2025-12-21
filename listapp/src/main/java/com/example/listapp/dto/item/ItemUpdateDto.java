@@ -8,4 +8,3 @@ public record ItemUpdateDto(
     Optional<@Size(max = 2000) String> notes,
     Optional<@Size(max = 1024) String> imagePath
 ){}
-
