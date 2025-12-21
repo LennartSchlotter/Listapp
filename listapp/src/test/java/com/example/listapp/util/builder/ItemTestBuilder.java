@@ -2,13 +2,10 @@ package com.example.listapp.util.builder;
 
 import static com.example.listapp.util.builder.ListTestBuilder.aList;
 
-import java.util.UUID;
-
 import com.example.listapp.entity.Item;
 import com.example.listapp.entity.ListEntity;
 
 public class ItemTestBuilder {
-    private UUID id = UUID.randomUUID();
     private ListEntity list = aList().build();
     private int position = 0;
     private String title = "Test item";
@@ -37,7 +34,6 @@ public class ItemTestBuilder {
 
     public Item build() {
         Item item = new Item();
-        item.setId(id);
         item.setList(list);
         item.setPosition(position);
         item.setTitle(title);
