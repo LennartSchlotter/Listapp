@@ -1,14 +1,11 @@
 package com.example.listapp.util.builder;
 
-import java.util.UUID;
-
 import com.example.listapp.entity.ListEntity;
 import com.example.listapp.entity.User;
 
 import static com.example.listapp.util.builder.UserTestBuilder.aUser;
 
 public class ListTestBuilder {
-    private UUID id = UUID.randomUUID();
     private User owner = aUser().build();
     private String title = "Test list";
     private String description = "Test description";
@@ -35,13 +32,16 @@ public class ListTestBuilder {
 
     public ListEntity build() {
         ListEntity list = new ListEntity();
-        list.setId(id);
         list.setOwner(owner);
         list.setTitle(title);
         list.setDescription(description);
         list.setDeleted(deleted);
 
         owner.getLists().add(list);
+
+        if (owner == null) {
+            throw new IllegalStateException("Owner must be set");
+        }
 
         return list;
     }
