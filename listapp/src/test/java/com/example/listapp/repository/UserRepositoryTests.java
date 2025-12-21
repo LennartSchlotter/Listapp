@@ -1,5 +1,6 @@
 package com.example.listapp.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,8 @@ public class UserRepositoryTests {
         var result = userRepository.findByName("Thomas");
 
         assertTrue(result.isPresent());
-        assertTrue(result.get().getName().equals("Thomas"));
-        assertTrue(result.get().getEmail().equals("thomas@example.com"));
+        assertEquals("Thomas", result.get().getName());
+        assertEquals("thomas@example.com", result.get().getEmail());
     }
 
     @Test
@@ -52,8 +53,8 @@ public class UserRepositoryTests {
         var result = userRepository.findByEmail("thomas@test.com");
 
         assertTrue(result.isPresent());
-        assertTrue(result.get().getName().equals("Thomas"));
-        assertTrue(result.get().getEmail().equals("thomas@test.com"));
+        assertEquals("Thomas", result.get().getName());
+        assertEquals("thomas@test.com", result.get().getEmail());
     }
 
     @Test
@@ -61,7 +62,7 @@ public class UserRepositoryTests {
         User user = aUser().withEmail("sophie@mail.de").build();
         entityManager.persistAndFlush(user);
 
-        var result = userRepository.findByEmail("Sophie");
+        var result = userRepository.findByEmail("sophi@mail.de");
 
         assertTrue(result.isEmpty());
     }
@@ -74,8 +75,8 @@ public class UserRepositoryTests {
         var result = userRepository.findByOauth2ProviderAndOauth2Sub("google", "oauth-sub-123");
 
         assertTrue(result.isPresent());
-        assertTrue(result.get().getOauth2Provider().equals("google"));
-        assertTrue(result.get().getOauth2Sub().equals("oauth-sub-123"));
+        assertEquals("google", result.get().getOauth2Provider());
+        assertEquals("oauth-sub-123", result.get().getOauth2Sub());
     }
 
     @Test
