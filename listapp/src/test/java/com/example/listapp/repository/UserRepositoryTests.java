@@ -1,5 +1,6 @@
 package com.example.listapp.repository;
 
+import static com.example.listapp.util.entities.UserTestBuilder.aUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,8 +11,6 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.example.listapp.entity.User;
-
-import static com.example.listapp.util.builder.UserTestBuilder.aUser;
 
 @DataJpaTest
 @ActiveProfiles("test")

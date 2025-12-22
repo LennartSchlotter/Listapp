@@ -1,11 +1,14 @@
-package com.example.listapp.util.builder;
+package com.example.listapp.util.entities;
+
+import static com.example.listapp.util.entities.UserTestBuilder.aUser;
+
+import java.util.UUID;
 
 import com.example.listapp.entity.ListEntity;
 import com.example.listapp.entity.User;
 
-import static com.example.listapp.util.builder.UserTestBuilder.aUser;
-
 public class ListTestBuilder {
+    private UUID id;
     private User owner = aUser().build();
     private String title = "Test list";
     private String description = "Test description";
@@ -13,6 +16,11 @@ public class ListTestBuilder {
 
     public static ListTestBuilder aList() {
         return new ListTestBuilder();
+    }
+
+    public ListTestBuilder withId(UUID id) {
+        this.id = id;
+        return this;
     }
 
     public ListTestBuilder withOwner(User owner) {
@@ -32,6 +40,7 @@ public class ListTestBuilder {
 
     public ListEntity build() {
         ListEntity list = new ListEntity();
+        list.setId(id);
         list.setOwner(owner);
         list.setTitle(title);
         list.setDescription(description);

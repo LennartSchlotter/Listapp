@@ -1,7 +1,7 @@
 package com.example.listapp.repository;
 
-import static com.example.listapp.util.builder.ListTestBuilder.aList;
-import static com.example.listapp.util.builder.UserTestBuilder.aUser;
+import static com.example.listapp.util.entities.ListTestBuilder.aList;
+import static com.example.listapp.util.entities.UserTestBuilder.aUser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

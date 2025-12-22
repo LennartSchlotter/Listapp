@@ -1,11 +1,14 @@
-package com.example.listapp.util.builder;
+package com.example.listapp.util.entities;
 
-import static com.example.listapp.util.builder.ListTestBuilder.aList;
+import static com.example.listapp.util.entities.ListTestBuilder.aList;
+
+import java.util.UUID;
 
 import com.example.listapp.entity.Item;
 import com.example.listapp.entity.ListEntity;
 
 public class ItemTestBuilder {
+    private UUID id;
     private ListEntity list = aList().build();
     private int position = 0;
     private String title = "Test item";
@@ -15,6 +18,11 @@ public class ItemTestBuilder {
 
     public static ItemTestBuilder anItem() {
         return new ItemTestBuilder();
+    }
+
+    public ItemTestBuilder withId(UUID id) {
+        this.id = id;
+        return this;
     }
 
     public ItemTestBuilder withList(ListEntity list) {
@@ -34,6 +42,7 @@ public class ItemTestBuilder {
 
     public Item build() {
         Item item = new Item();
+        item.setId(id);
         item.setList(list);
         item.setPosition(position);
         item.setTitle(title);
