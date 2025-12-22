@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,7 @@ import com.example.listapp.exception.custom.AccessDeniedException;
 import com.example.listapp.exception.custom.ResourceNotFoundException;
 import com.example.listapp.mapper.ListMapper;
 import com.example.listapp.repository.ListRepository;
-import com.example.listapp.security.CustomOAuth2User;
+import com.example.listapp.security.SecurityUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,7 @@ public class ListService {
 
     private final ListRepository _listRepository;
     private final ListMapper _listMapper;
+    private final SecurityUtil _securityUtil;
     
     /**
      * Retrieves all lists associated with the authenticated user.
@@ -36,7 +36,7 @@ public class ListService {
      */
     @Transactional(readOnly = true)
     public List<ListResponseDto> getAllUserLists() {
-        UUID ownerId = getCurrentUser().getId();
+        UUID ownerId = _securityUtil.getCurrentUser().getId();
         List<ListEntity> entityList = _listRepository.findAllByOwnerId(ownerId);
 
         List<ListResponseDto> dtoList = entityList.stream()
@@ -72,7 +72,7 @@ public class ListService {
     public UUID createList(ListCreateDto dto) {
         ListEntity entity = _listMapper.toEntity(dto);
 
-        User currentUser = getCurrentUser();
+        User currentUser = _securityUtil.getCurrentUser();
         entity.setOwner(currentUser);
 
         ListEntity savedEntity =_listRepository.save(entity);
@@ -120,19 +120,11 @@ public class ListService {
     }
 
     private void validateOwnership(ListEntity entity) {
-        User currentUser = getCurrentUser();
+        User currentUser = _securityUtil.getCurrentUser();
         if (!entity.getOwner().getId().equals(currentUser.getId())) {
             log.warn("User {} attempted to access list {} owned by user {}", 
                 currentUser.getId(), entity.getId(), entity.getOwner().getId());
             throw new AccessDeniedException("You don't have permission to access this list");
         }
-    }
-
-    private User getCurrentUser() {
-        CustomOAuth2User principal = (CustomOAuth2User) SecurityContextHolder
-            .getContext()
-            .getAuthentication()
-            .getPrincipal();
-        return principal.getUser();
     }
 }
