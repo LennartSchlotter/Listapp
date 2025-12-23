@@ -1,5 +1,6 @@
 package com.example.listapp.service.Security;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -41,6 +42,7 @@ public class ItemSecurityService {
      */
     public boolean canAccessList(UUID listId) {
         User currentUser = _securityUtil.getCurrentUser();
-        return (_listRepository.findByIdAndOwnerId(listId, currentUser.getId()) != null);
+        Optional<?> optionalList = _listRepository.findByIdAndOwnerId(listId, currentUser.getId());
+        return optionalList.isPresent();
     }
 }

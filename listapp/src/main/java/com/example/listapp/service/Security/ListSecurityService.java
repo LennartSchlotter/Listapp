@@ -1,9 +1,11 @@
 package com.example.listapp.service.Security;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.example.listapp.entity.ListEntity;
 import com.example.listapp.entity.User;
 import com.example.listapp.repository.ListRepository;
 import com.example.listapp.security.SecurityUtil;
@@ -26,6 +28,7 @@ public class ListSecurityService {
      */
     public boolean isOwner(UUID listId){
         User currentUser = _securityUtil.getCurrentUser();
-        return (_listRepository.findByIdAndOwnerId(listId, currentUser.getId()) != null);
+        Optional<ListEntity> optional = _listRepository.findByIdAndOwnerId(listId, currentUser.getId());
+        return optional.isPresent();
     }
 }
