@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.listapp.dto.user.UserResponseDto;
 import com.example.listapp.dto.user.UserUpdateDto;
 import com.example.listapp.entity.User;
-import com.example.listapp.exception.custom.ResourceNotFoundException;
 import com.example.listapp.mapper.UserMapper;
 import com.example.listapp.repository.UserRepository;
 import com.example.listapp.security.SecurityUtil;
