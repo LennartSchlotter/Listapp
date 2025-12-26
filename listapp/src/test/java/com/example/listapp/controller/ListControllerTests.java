@@ -29,7 +29,9 @@ import com.example.listapp.dto.list.ListResponseDto;
 import com.example.listapp.dto.list.ListUpdateDto;
 import com.example.listapp.service.ListService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @WebMvcTest(ListController.class)
 public class ListControllerTests {
@@ -40,7 +42,10 @@ public class ListControllerTests {
     @MockitoBean
     private ListService listService;
 
-    ObjectMapper objectMapper = new ObjectMapper().registerModule(new Jdk8Module());
+    ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .registerModule(new Jdk8Module())
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     @Test
     @WithMockUser
@@ -53,7 +58,7 @@ public class ListControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto))
                 .with(csrf()))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").value(expectedId.toString()));
 
@@ -70,7 +75,8 @@ public class ListControllerTests {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(responseDto.id().toString()));
+                .andExpect(jsonPath("$.id").value(responseDto.id().toString()))
+                .andExpect(content().json(objectMapper.writeValueAsString(responseDto)));
 
         verify(listService).getListById(responseDto.id());
     }
@@ -88,7 +94,9 @@ public class ListControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(responseDto1.id().toString()))
-                .andExpect(jsonPath("$[1].id").value(responseDto2.id().toString()));
+                .andExpect(jsonPath("$[1].id").value(responseDto2.id().toString()))
+                .andExpect(jsonPath("$.size()").value(listResponse.size()))
+                .andExpect(content().json(objectMapper.writeValueAsString(listResponse)));
 
         verify(listService).getAllUserLists();
     }
@@ -122,12 +130,4 @@ public class ListControllerTests {
 
         verify(listService).deleteList(randomId);
     }
-
-    //Successful requests: Verify correct HTTP status (e.g., 200 OK or 201 Created), response body content, and headers.
-    //Error scenarios: Test invalid inputs, validation failures (e.g., using @Valid), not-found cases (404), and server errors (500).
-    //Different HTTP methods: GET, POST, PUT, DELETE, etc.
-    //Path variables, query parameters, and request bodies: Ensure proper binding and handling.
-    //Content negotiation: JSON serialization/deserialization, media types.
-    //Security (if applicable): Test authentication/authorization with Spring Security test support.
-    //Validation: Assert that bean validation annotations (e.g., @NotNull) trigger appropriate errors.
 }
