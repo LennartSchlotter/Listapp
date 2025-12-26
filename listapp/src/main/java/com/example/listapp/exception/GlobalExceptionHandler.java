@@ -11,6 +11,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.example.listapp.dto.error.ErrorResponseDto;
 import com.example.listapp.exception.base.ApplicationException;
@@ -131,7 +132,21 @@ public class GlobalExceptionHandler {
     );
     
     return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
-}
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDto> handleTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
+        log.error("Method argument type mismatch: {}", ex.getMessage(), ex);
+
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+            HttpStatus.BAD_REQUEST.value(),
+            HttpStatus.BAD_REQUEST.getReasonPhrase(),
+            "Validation failed",
+            "VALIDATION_ERROR"
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
     /**
      * Handles all other exceptions.
