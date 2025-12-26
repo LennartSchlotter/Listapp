@@ -34,8 +34,8 @@ public class GlobalExceptionHandler {
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
             ex.getStatus().value(),
-            ex.getStatus().getReasonPhrase(),
             ex.getMessage(),
+            ex.getStatus().getReasonPhrase(),
             ex.getErrorCode()
         );
 
