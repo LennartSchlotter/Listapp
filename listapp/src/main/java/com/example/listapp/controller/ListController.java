@@ -1,5 +1,6 @@
 package com.example.listapp.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.listapp.dto.list.ListCreateDto;
 import com.example.listapp.dto.list.ListResponseDto;
@@ -42,7 +44,7 @@ public class ListController {
 
     @Operation(summary = "Create a new list", description = "Add a new list to the system")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "List created successfully",
+        @ApiResponse(responseCode = "201", description = "List created successfully",
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = UUID.class))),
         @ApiResponse(responseCode = "400", description = "Invalid request data",
@@ -52,7 +54,9 @@ public class ListController {
     @PostMapping
     public ResponseEntity<UUID> CreateList(@Valid @RequestBody ListCreateDto dto){
         UUID createdId = _listService.createList(dto);
-        return ResponseEntity.ok(createdId);
+        
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdId).toUri();
+        return ResponseEntity.created(location).body(createdId);
     }
 
     @Operation(summary = "Get a list by ID", description = "Retrieves details of a specific list")

@@ -1,5 +1,6 @@
 package com.example.listapp.controller;
 
+import java.net.URI;
 import java.util.UUID;
 
 import org.springframework.http.ProblemDetail;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.listapp.dto.item.ItemCreateDto;
 import com.example.listapp.dto.item.ItemReorderDto;
@@ -41,7 +43,7 @@ public class ItemController {
 
     @Operation(summary = "Create a new item", description = "Add a new item to the system")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Item created successfully",
+        @ApiResponse(responseCode = "201", description = "Item created successfully",
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = UUID.class))),
         @ApiResponse(responseCode = "400", description = "Invalid request data",
@@ -54,7 +56,9 @@ public class ItemController {
             @Parameter(description = "ID of the list to add the item to") @PathVariable UUID listId, 
             @Valid @RequestBody ItemCreateDto dto) {
         UUID createdId = _itemService.createItem(listId, dto);
-        return ResponseEntity.ok(createdId);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdId).toUri();
+        return ResponseEntity.created(location).body(createdId);
     }
 
     @Operation(summary = "Update an item", description = "Update an existing item's details")
