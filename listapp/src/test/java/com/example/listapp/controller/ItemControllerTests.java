@@ -302,6 +302,23 @@ public class ItemControllerTests {
 
     @Test
     @WithMockUser
+    void updateItem_ShouldThrowBadRequest_WhenInvalidQueryParameterIsPassed() throws Exception {
+        ListEntity list = aList().withId(UUID.randomUUID()).build();
+        String invalidId = "123";
+
+        mockMvc.perform(patch("/api/v1/lists/{listId}/items/{id}", list.getId(), invalidId)
+                .with(csrf())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
+
+        verifyNoInteractions(itemService);
+    }
+
+    @Test
+    @WithMockUser
     void reorderItems_ShouldReturnNoContent_WhenAuthenticated() throws Exception {
         ListEntity list = aList().withId(UUID.randomUUID()).build();
         Item item1 = anItem().withId(UUID.randomUUID()).withList(list).build();

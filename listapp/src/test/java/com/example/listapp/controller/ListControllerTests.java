@@ -319,6 +319,22 @@ public class ListControllerTests {
 
     @Test
     @WithMockUser
+    void updateList_ShouldThrowBadRequest_WhenInvalidQueryParameterIsPassed() throws Exception {
+        String invalidId = "123";
+
+        mockMvc.perform(patch("/api/v1/lists/{id}", invalidId)
+                .with(csrf())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Validation failed"));
+
+        verifyNoInteractions(listService);
+    }
+
+    @Test
+    @WithMockUser
     void deleteList_ShouldReturnNoContent_WhenAuthenticated() throws Exception {
         UUID randomId = UUID.randomUUID();
         mockMvc.perform(delete("/api/v1/lists/{id}", randomId)
