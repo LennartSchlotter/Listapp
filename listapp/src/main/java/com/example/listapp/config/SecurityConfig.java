@@ -1,5 +1,6 @@
 package com.example.listapp.config;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -7,23 +8,34 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.listapp.security.CustomCsrfTokenRequestHandler;
+import com.example.listapp.security.OAuth2SuccessHandler;
 import com.example.listapp.service.Security.AuthenticationService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationService _authenticationService;
-
-    public SecurityConfig(AuthenticationService authenticationService) {
-        _authenticationService = authenticationService;
-    }
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final AuthenticationService authenticationService;
 
     /**
      * Defines the security filter chain for the application.
@@ -35,12 +47,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) //!remove in prod!
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CustomCsrfTokenRequestHandler())
+            )
+            .addFilterAfter(csrfTokenBootstrapFilter(), CsrfFilter.class)
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                     "/",
                     "/login",
                     "/oauth2/**",
+                    "/login/oauth2/**",
                     "/error",
                     "/v3/api-docs/**",
                     "/swagger-resources/**",
@@ -50,13 +70,15 @@ public class SecurityConfig {
             )
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> userInfo
-                    .userService(_authenticationService)
+                    .oidcUserService(authenticationService)
                 )
-                .defaultSuccessUrl("/swagger-ui/index.html", true)
+                .successHandler(oAuth2SuccessHandler)
             )
             .logout(logout -> logout
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
-                .permitAll()
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
             );
         
         return http.build();
@@ -70,13 +92,34 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8080"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:8080"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-
+        configuration.setExposedHeaders(List.of("*"));
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    /**
+     * Forces eager initialization of the CSRF token.
+     * @return a filter instance to be registered in the filter chain.
+     */
+    @Bean
+    public OncePerRequestFilter csrfTokenBootstrapFilter() {
+        return new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+                Object csrfAttr = request.getAttribute(CsrfToken.class.getName());
+                if (csrfAttr instanceof CsrfToken csrfToken) {
+                    csrfToken.getToken();
+                }
+
+                filterChain.doFilter(request, response);
+            }
+        };
     }
 }
