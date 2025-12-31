@@ -1,19 +1,17 @@
 package com.example.listapp.service.Security;
 
-import java.util.Map;
-
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 import com.example.listapp.entity.User;
 import com.example.listapp.repository.UserRepository;
-import com.example.listapp.security.CustomOAuth2User;
+import com.example.listapp.security.CustomOidcUser;
 
 @Service
-public class AuthenticationService extends DefaultOAuth2UserService {
+public class AuthenticationService extends OidcUserService {
     
     private final UserRepository _userRepository;
 
@@ -22,17 +20,16 @@ public class AuthenticationService extends DefaultOAuth2UserService {
     }
 
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oauth2User = super.loadUser(userRequest);
+    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+        OidcUser oidcUser = super.loadUser(userRequest);
 
-        Map<String, Object> attributes = oauth2User.getAttributes();
         String provider = userRequest.getClientRegistration().getRegistrationId();
-        String sub = (String) attributes.get("sub");
-        String email = (String) attributes.get("email");
-        String name = (String) attributes.get("name");
+        String sub = (String) oidcUser.getSubject();
+        String email = (String) oidcUser.getEmail();
+        String name = (String) oidcUser.getName();
 
         // Create or update the user based on the OAuth data.
-        User user = _userRepository.findByOauth2ProviderAndOauth2Sub(provider, sub)
+        User userEntity = _userRepository.findByOauth2ProviderAndOauth2Sub(provider, sub)
             .map(existingUser -> {
                 existingUser.setName(name);
                 existingUser.setEmail(email);
@@ -47,6 +44,6 @@ public class AuthenticationService extends DefaultOAuth2UserService {
                 return _userRepository.save(newUser);
             });
         
-        return new CustomOAuth2User(oauth2User, user);
+        return new CustomOidcUser(oidcUser.getAuthorities(), oidcUser.getIdToken(), oidcUser.getUserInfo(), userEntity);
     }
 }

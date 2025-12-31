@@ -25,10 +25,10 @@ public class SecurityUtil {
         
         Object principal = authentication.getPrincipal();
         
-        if (!(principal instanceof CustomOAuth2User oAuth2User)) {
-            throw new AccessDeniedException("Invalid authentication principal");
+        if (principal instanceof CustomOidcUser user) {
+            return user.getUser();
+        } else {
+            throw new AccessDeniedException("Invalid principal type");
         }
-
-        return oAuth2User.getUser();
     }
 }
