@@ -14,6 +14,7 @@
     "generate-routes": "tsr generate"
   },
   "dependencies": {
+    "@hey-api/client-fetch": "^0.13.1",
     "@mui/material": "^7.3.6",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-query": "^5.90.16",
