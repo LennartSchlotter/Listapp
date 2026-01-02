@@ -1,4 +1,4 @@
-import { createClient } from '../api/client.gen';
+import { createClient } from '../api/client/client.gen';
 
 export const apiClient = createClient({
   baseUrl: '',
