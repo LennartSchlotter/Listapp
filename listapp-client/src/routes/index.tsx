@@ -1,6 +1,5 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { LoginButton } from '../components/LoginButton';
-import { CreateListButton } from '../components/CreateListButton';
 import { useEffect } from 'react';
 import { getUser } from '../api';
 import { apiClient } from '../lib/apiClient';
@@ -29,7 +28,6 @@ function UnauthenticatedHome() {
     <div style={{ padding: '2rem', textAlign: 'center' }}>
       <h1>Welcome</h1>
       <LoginButton />
-      <CreateListButton />
     </div>
   );
 }
