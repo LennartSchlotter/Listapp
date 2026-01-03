@@ -25,7 +25,7 @@ function UnauthenticatedHome() {
   }, [router]);
 
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <div>
       <h1>Welcome</h1>
       <LoginButton />
     </div>
