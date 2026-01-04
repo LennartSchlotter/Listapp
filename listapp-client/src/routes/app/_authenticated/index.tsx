@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { CreateListButton } from '../../../components/CreateListButton';
-import { GetListButton } from '../../../components/GetListsButton';
+import BaseLayout from '../../../layouts/Layout';
+import MainModule from '../../../features/UserMenu/components/Project/components/MainModule';
 
 export const Route = createFileRoute('/app/_authenticated/')({
   component: MainApp,
@@ -8,10 +8,8 @@ export const Route = createFileRoute('/app/_authenticated/')({
 
 function MainApp() {
   return (
-    <div>
-      <h1>Main Application</h1>
-      <CreateListButton />
-      <GetListButton />
-    </div>
+    <BaseLayout>
+      <MainModule />
+    </BaseLayout>
   );
 }
