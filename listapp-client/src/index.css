@@ -1,1 +1,6 @@
+@import url('https://fonts.google.com/specimen/Bebas+Neue');
 @import "tailwindcss";
+
+@theme {
+    --font-bebas: "Bebas Neue", sans-serif;
+}
