@@ -26,7 +26,7 @@ public class AuthenticationService extends OidcUserService {
         String provider = userRequest.getClientRegistration().getRegistrationId();
         String sub = (String) oidcUser.getSubject();
         String email = (String) oidcUser.getEmail();
-        String name = (String) oidcUser.getName();
+        String name = (String) oidcUser.getFullName();
 
         // Create or update the user based on the OAuth data.
         User userEntity = _userRepository.findByOauth2ProviderAndOauth2Sub(provider, sub)
