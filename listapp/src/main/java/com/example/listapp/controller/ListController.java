@@ -24,6 +24,7 @@ import com.example.listapp.service.ListService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -78,7 +79,8 @@ public class ListController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lists retrieved successfully",
             content = @Content(mediaType = "application/json",
-                schema = @Schema(type = "array", implementation = ListResponseDto.class)))
+                array = @ArraySchema(
+                schema = @Schema(type = "array", implementation = ListResponseDto.class))))
     })
     @GetMapping
     public ResponseEntity<List<ListResponseDto>> GetLists(){

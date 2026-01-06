@@ -97,7 +97,7 @@ export type GetListsResponses = {
     /**
      * Lists retrieved successfully
      */
-    200: ListResponseDto;
+    200: Array<ListResponseDto>;
 };
 
 export type GetListsResponse = GetListsResponses[keyof GetListsResponses];
