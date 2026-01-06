@@ -52,8 +52,12 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(new CustomCsrfTokenRequestHandler())
             )
             .addFilterAfter(csrfTokenBootstrapFilter(), CsrfFilter.class)
+            .securityContext(securityContext -> securityContext
+                .requireExplicitSave(false)
+            )
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .sessionFixation().none()
             )
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
@@ -73,6 +77,12 @@ public class SecurityConfig {
                     .oidcUserService(authenticationService)
                 )
                 .successHandler(oAuth2SuccessHandler)
+            )
+            .exceptionHandling(exception -> exception
+                .defaultAuthenticationEntryPointFor(
+                    (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED),
+                    request -> request.getRequestURI().startsWith("/api/")
+                )
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")

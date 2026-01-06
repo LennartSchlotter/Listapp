@@ -6,7 +6,7 @@ import { apiClient } from '../../lib/apiClient';
 export const Route = createFileRoute('/app/_authenticated')({
   beforeLoad: async () => {
     try {
-      await getUser({ client: apiClient });
+      await getUser({ client: apiClient, throwOnError: true });
     } catch {
       throw redirect({ to: '/' });
     }
@@ -18,7 +18,9 @@ function AuthenticatedLayout() {
   const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
-    getUser({ client: apiClient }).finally(() => setBootstrapped(true));
+    getUser({ client: apiClient, throwOnError: true }).finally(() =>
+      setBootstrapped(true)
+    );
   }, []);
 
   if (!bootstrapped) {

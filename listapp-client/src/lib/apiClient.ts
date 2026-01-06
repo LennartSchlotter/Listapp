@@ -1,7 +1,7 @@
 import { createClient } from '../api/client/client.gen';
 
 export const apiClient = createClient({
-  baseUrl: '/',
+  baseUrl: '',
 
   fetch: async (input, init) => {
     const csrfToken = getCsrfToken();

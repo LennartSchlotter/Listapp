@@ -14,7 +14,7 @@ function UnauthenticatedHome() {
   useEffect(() => {
     const redirect = async () => {
       try {
-        await getUser({ client: apiClient });
+        await getUser({ client: apiClient, throwOnError: true });
         router.navigate({ to: '/app' });
       } catch {
         /* unauthenticated */
