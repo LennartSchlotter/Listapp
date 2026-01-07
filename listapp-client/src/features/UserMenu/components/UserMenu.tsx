@@ -1,13 +1,15 @@
 import React from 'react';
 import CustomAvatar from './CustomAvatar';
 import { MenuItem, IconButton, Menu, ListItemIcon } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useRouter } from '@tanstack/react-router';
 
 export default function UserMenu() {
   const [anchorElement, setAnchorElement] = React.useState<null | HTMLElement>(
     null
   );
   const open = Boolean(anchorElement);
+  const router = useRouter();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElement(event.currentTarget);
@@ -17,8 +19,9 @@ export default function UserMenu() {
     setAnchorElement(null);
   };
 
-  const handleLogout = () => {
+  const handleProfile = () => {
     handleClose();
+    router.navigate({ to: '/app/profile' });
   };
 
   return (
@@ -34,13 +37,13 @@ export default function UserMenu() {
       <Menu anchorEl={anchorElement} open={open} onClose={handleClose}>
         <MenuItem
           onClick={() => {
-            handleLogout();
+            handleProfile();
           }}
           className="box-border flex justify-center items-center text-center"
         >
-          Log out
-          <ListItemIcon onClick={handleLogout}>
-            <LogoutIcon />
+          Profile
+          <ListItemIcon className="ml-2" onClick={handleProfile}>
+            <AccountCircleIcon />
           </ListItemIcon>
         </MenuItem>
       </Menu>
