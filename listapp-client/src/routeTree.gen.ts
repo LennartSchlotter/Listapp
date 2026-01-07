@@ -13,6 +13,8 @@ import { Route as OauthCallbackRouteImport } from './routes/oauth-callback'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppAuthenticatedRouteImport } from './routes/app/_authenticated'
 import { Route as AppAuthenticatedIndexRouteImport } from './routes/app/_authenticated/index'
+import { Route as AppAuthenticatedProfileRouteImport } from './routes/app/_authenticated/profile'
+import { Route as AppAuthenticatedListsListIdRouteImport } from './routes/app/_authenticated/lists.$listId'
 
 const OauthCallbackRoute = OauthCallbackRouteImport.update({
   id: '/oauth-callback',
@@ -34,36 +36,61 @@ const AppAuthenticatedIndexRoute = AppAuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppAuthenticatedRoute,
 } as any)
+const AppAuthenticatedProfileRoute = AppAuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppAuthenticatedRoute,
+} as any)
+const AppAuthenticatedListsListIdRoute =
+  AppAuthenticatedListsListIdRouteImport.update({
+    id: '/lists/$listId',
+    path: '/lists/$listId',
+    getParentRoute: () => AppAuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/oauth-callback': typeof OauthCallbackRoute
   '/app': typeof AppAuthenticatedRouteWithChildren
+  '/app/profile': typeof AppAuthenticatedProfileRoute
   '/app/': typeof AppAuthenticatedIndexRoute
+  '/app/lists/$listId': typeof AppAuthenticatedListsListIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/oauth-callback': typeof OauthCallbackRoute
+  '/app/profile': typeof AppAuthenticatedProfileRoute
   '/app': typeof AppAuthenticatedIndexRoute
+  '/app/lists/$listId': typeof AppAuthenticatedListsListIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/oauth-callback': typeof OauthCallbackRoute
   '/app/_authenticated': typeof AppAuthenticatedRouteWithChildren
+  '/app/_authenticated/profile': typeof AppAuthenticatedProfileRoute
   '/app/_authenticated/': typeof AppAuthenticatedIndexRoute
+  '/app/_authenticated/lists/$listId': typeof AppAuthenticatedListsListIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/oauth-callback' | '/app' | '/app/'
+  fullPaths:
+    | '/'
+    | '/oauth-callback'
+    | '/app'
+    | '/app/profile'
+    | '/app/'
+    | '/app/lists/$listId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/oauth-callback' | '/app'
+  to: '/' | '/oauth-callback' | '/app/profile' | '/app' | '/app/lists/$listId'
   id:
     | '__root__'
     | '/'
     | '/oauth-callback'
     | '/app/_authenticated'
+    | '/app/_authenticated/profile'
     | '/app/_authenticated/'
+    | '/app/_authenticated/lists/$listId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -102,15 +129,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuthenticatedIndexRouteImport
       parentRoute: typeof AppAuthenticatedRoute
     }
+    '/app/_authenticated/profile': {
+      id: '/app/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppAuthenticatedProfileRouteImport
+      parentRoute: typeof AppAuthenticatedRoute
+    }
+    '/app/_authenticated/lists/$listId': {
+      id: '/app/_authenticated/lists/$listId'
+      path: '/lists/$listId'
+      fullPath: '/app/lists/$listId'
+      preLoaderRoute: typeof AppAuthenticatedListsListIdRouteImport
+      parentRoute: typeof AppAuthenticatedRoute
+    }
   }
 }
 
 interface AppAuthenticatedRouteChildren {
+  AppAuthenticatedProfileRoute: typeof AppAuthenticatedProfileRoute
   AppAuthenticatedIndexRoute: typeof AppAuthenticatedIndexRoute
+  AppAuthenticatedListsListIdRoute: typeof AppAuthenticatedListsListIdRoute
 }
 
 const AppAuthenticatedRouteChildren: AppAuthenticatedRouteChildren = {
+  AppAuthenticatedProfileRoute: AppAuthenticatedProfileRoute,
   AppAuthenticatedIndexRoute: AppAuthenticatedIndexRoute,
+  AppAuthenticatedListsListIdRoute: AppAuthenticatedListsListIdRoute,
 }
 
 const AppAuthenticatedRouteWithChildren =

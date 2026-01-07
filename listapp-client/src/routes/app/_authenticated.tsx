@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { getUser } from '../../api/sdk.gen';
 import { apiClient } from '../../lib/apiClient';
+import BaseLayout from '../../layouts/Layout';
 
 export const Route = createFileRoute('/app/_authenticated')({
   beforeLoad: async () => {
@@ -30,7 +31,9 @@ function AuthenticatedLayout() {
   return (
     <>
       {/* ThemeProvider, CssBaseline, Toaster, BaseLayout */}
-      <Outlet />
+      <BaseLayout>
+        <Outlet />
+      </BaseLayout>
     </>
   );
 }

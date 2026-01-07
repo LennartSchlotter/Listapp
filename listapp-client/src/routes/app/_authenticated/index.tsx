@@ -1,15 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import BaseLayout from '../../../layouts/Layout';
-import MainModule from '../../../features/UserMenu/components/Project/components/MainModule';
+import AllListsModule from '../../../features/Lists/components/AllListsModule';
 
 export const Route = createFileRoute('/app/_authenticated/')({
-  component: MainApp,
+  component: AllLists,
 });
 
-function MainApp() {
-  return (
-    <BaseLayout>
-      <MainModule />
-    </BaseLayout>
-  );
+function AllLists() {
+  return <AllListsModule />;
 }
