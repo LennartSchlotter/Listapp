@@ -66,6 +66,7 @@ export type UserResponseDto = {
 export type ItemSummaryDto = {
     id?: string;
     title?: string;
+    notes?: string;
     position?: number;
     imagePath?: string;
 };
