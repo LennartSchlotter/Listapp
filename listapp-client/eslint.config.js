@@ -37,6 +37,7 @@ export default defineConfig([
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      'react/prop-types': 'off',
     },
   },
   js.configs.recommended,
