@@ -49,7 +49,7 @@ const ItemModule: React.FC<ItemModuleProps> = ({
                   onEdit(item);
                 }}
               >
-                <EditIcon />
+                <EditIcon className="text-blue-400" />
               </IconButton>
               <IconButton
                 edge="end"
@@ -59,7 +59,7 @@ const ItemModule: React.FC<ItemModuleProps> = ({
                   onDelete(item);
                 }}
               >
-                <DeleteIcon />
+                <DeleteIcon className="text-red-400" />
               </IconButton>
             </div>
           }
@@ -76,7 +76,7 @@ const ItemModule: React.FC<ItemModuleProps> = ({
         <DialogContent dividers>
           <p>
             <strong>Notes: </strong>
-            Notes Placeholder
+            {item.notes}
           </p>
         </DialogContent>
         <DialogActions>
