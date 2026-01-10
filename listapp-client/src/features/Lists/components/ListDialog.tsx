@@ -59,7 +59,7 @@ export function ListDialog({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        {mode === 'create' ? 'Create nw List' : 'Update List'}
+        {mode === 'create' ? 'Create new List' : 'Update List'}
       </DialogTitle>
       <DialogContent>
         <TextField
