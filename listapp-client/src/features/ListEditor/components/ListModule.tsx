@@ -10,9 +10,16 @@ import { useUpdateItem } from '../hooks/useUpdateItem';
 import { useDeleteItem } from '../hooks/useDeleteItem';
 import { useCreateItem } from '../hooks/useCreateItem';
 import { Box, Button, Container } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { ItemDialog } from './ItemDialog';
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { useReorderItems } from '../hooks/useReorderItems';
 
 export default function ListModule() {
   const { listId } = useParams({ from: '/app/_authenticated/lists/$listId' });
@@ -20,9 +27,20 @@ export default function ListModule() {
   const { mutate: updateItem } = useUpdateItem();
   const { mutate: deleteItem } = useDeleteItem();
   const { mutate: createItem } = useCreateItem();
+  const { mutate: reorderItems } = useReorderItems();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'update'>('create');
   const [selectedItem, setSelectedItem] = useState<ItemSummaryDto | null>(null);
+  const [items, setItems] = useState<ItemSummaryDto[]>([]);
+  const updateItems = useEffectEvent((newItems: ItemSummaryDto[]) => {
+    setItems(newItems);
+  });
+
+  useEffect(() => {
+    if (data?.items) {
+      updateItems(data.items);
+    }
+  }, [data]);
 
   const handleDelete = (item: ItemSummaryDto) => {
     deleteItem({
@@ -67,8 +85,24 @@ export default function ListModule() {
     }
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setItems((prev) => {
+      const oldIndex = prev.findIndex((i) => i.id === active.id);
+      const newIndex = prev.findIndex((i) => i.id === over.id);
+      const newItems = arrayMove(prev, oldIndex, newIndex);
+
+      reorderItems({ listId, dto: { itemOrder: newItems.map((i) => i.id!) } });
+
+      return newItems;
+    });
+  };
+
   return (
-    <div>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       {!isLoading && !isError && data ? (
         <Container maxWidth="md" sx={{ py: 4 }}>
           <Box
@@ -92,17 +126,20 @@ export default function ListModule() {
               Create New Item
             </Button>
           </Box>
-          {data!.items?.map((item: ItemSummaryDto) => (
-            <ItemModule
-              key={item.id}
-              item={item}
-              onEdit={handleOpenUpdate}
-              onDelete={handleDelete}
-            />
-          ))}
-          {(!data!.items ||
-            data!.items.length === 0 ||
-            data!.items === undefined) && (
+          <SortableContext
+            items={items.map((i) => i.id!)}
+            strategy={verticalListSortingStrategy}
+          >
+            {items.map((item) => (
+              <ItemModule
+                key={item.id}
+                item={item}
+                onEdit={handleOpenUpdate}
+                onDelete={handleDelete}
+              />
+            ))}
+          </SortableContext>
+          {items.length === 0 && (
             <p className="text-center py-8 text-gray-500">
               No items in this list.
             </p>
@@ -121,6 +158,6 @@ export default function ListModule() {
         initialNotes={selectedItem?.notes}
         initialImagePath={selectedItem?.imagePath}
       />
-    </div>
+    </DndContext>
   );
 }
