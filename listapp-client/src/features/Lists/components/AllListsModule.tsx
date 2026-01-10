@@ -45,7 +45,12 @@ export default function AllListsModule() {
     description?: string | null;
   }) => {
     if (dialogMode === 'create') {
-      const dto: ListCreateDto = { title: data.title };
+      const dto: ListCreateDto = {
+        title: data.title,
+        ...(data.description !== undefined && {
+          description: data.description ?? undefined,
+        }),
+      };
       createList({ dto });
     } else if (selectedList) {
       const dto: Partial<ListUpdateDto> = {};
