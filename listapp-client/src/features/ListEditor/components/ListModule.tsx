@@ -9,7 +9,13 @@ import ItemModule from './ItemModule';
 import { useUpdateItem } from '../hooks/useUpdateItem';
 import { useDeleteItem } from '../hooks/useDeleteItem';
 import { useCreateItem } from '../hooks/useCreateItem';
-import { Box, Button, Container } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@mui/material';
 import { useEffect, useEffectEvent, useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { ItemDialog } from './ItemDialog';
@@ -20,6 +26,8 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { useReorderItems } from '../hooks/useReorderItems';
+
+type ViewMode = 'text' | 'image';
 
 export default function ListModule() {
   const { listId } = useParams({ from: '/app/_authenticated/lists/$listId' });
@@ -32,6 +40,7 @@ export default function ListModule() {
   const [dialogMode, setDialogMode] = useState<'create' | 'update'>('create');
   const [selectedItem, setSelectedItem] = useState<ItemSummaryDto | null>(null);
   const [items, setItems] = useState<ItemSummaryDto[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('text');
   const updateItems = useEffectEvent((newItems: ItemSummaryDto[]) => {
     setItems(newItems);
   });
@@ -101,6 +110,12 @@ export default function ListModule() {
     });
   };
 
+  const isImageModeAvailable =
+    items.length > 0 &&
+    items.every(
+      (i) => typeof i.imagePath === 'string' && i.imagePath.trim() !== ''
+    );
+
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       {!isLoading && !isError && data ? (
@@ -113,6 +128,21 @@ export default function ListModule() {
               mb: 4,
             }}
           >
+            {isImageModeAvailable ? (
+              <ToggleButtonGroup
+                color="primary"
+                value={viewMode}
+                exclusive
+                onChange={(_, newView) => newView && setViewMode(newView)}
+                aria-label="View mode"
+                size="small"
+              >
+                <ToggleButton value="image">Image Mode</ToggleButton>
+                <ToggleButton value="text">Text Mode</ToggleButton>
+              </ToggleButtonGroup>
+            ) : (
+              ''
+            )}
             <h1 className="text-3xl font-bold text-center mb-8">
               {data.title}
             </h1>
@@ -121,7 +151,7 @@ export default function ListModule() {
               color="success"
               startIcon={<AddIcon />}
               onClick={handleOpenCreate}
-              size="large"
+              size="small"
             >
               Create New Item
             </Button>
