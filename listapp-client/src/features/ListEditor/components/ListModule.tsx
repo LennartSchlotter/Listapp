@@ -1,22 +1,18 @@
 import { useParams } from '@tanstack/react-router';
 import { useGetListById } from '../hooks/useGetListById';
-import type { ItemCreateDto, ItemSummaryDto } from '../../../api';
+import type {
+  ItemCreateDto,
+  ItemSummaryDto,
+  ItemUpdateDto,
+} from '../../../api';
 import ItemModule from './ItemModule';
 import { useUpdateItem } from '../hooks/useUpdateItem';
 import { useDeleteItem } from '../hooks/useDeleteItem';
 import { useCreateItem } from '../hooks/useCreateItem';
-import {
-  Box,
-  Button,
-  Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from '@mui/material';
+import { Box, Button, Container } from '@mui/material';
 import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import { ItemDialog } from './ItemDialog';
 
 export default function ListModule() {
   const { listId } = useParams({ from: '/app/_authenticated/lists/$listId' });
@@ -24,18 +20,9 @@ export default function ListModule() {
   const { mutate: updateItem } = useUpdateItem();
   const { mutate: deleteItem } = useDeleteItem();
   const { mutate: createItem } = useCreateItem();
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [notes, setNotes] = useState('');
-  const [imagePath, setImagePath] = useState('');
-
-  const handleEdit = (item: ItemSummaryDto) => {
-    updateItem({
-      listId: listId,
-      id: item.id!,
-      dto: item,
-    });
-  };
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'update'>('create');
+  const [selectedItem, setSelectedItem] = useState<ItemSummaryDto | null>(null);
 
   const handleDelete = (item: ItemSummaryDto) => {
     deleteItem({
@@ -44,41 +31,40 @@ export default function ListModule() {
     });
   };
 
-  const handleCreate = () => {
-    if (!title.trim()) return;
-
-    const newItem: ItemCreateDto = {
-      title: title.trim(),
-    };
-
-    const trimmedNotes = notes.trim();
-    if (trimmedNotes) {
-      newItem.notes = trimmedNotes;
-    }
-
-    const trimmedImagePath = imagePath.trim();
-    if (trimmedImagePath) {
-      newItem.imagePath = trimmedImagePath;
-    }
-
-    createItem(
-      {
-        listId: listId,
-        dto: newItem,
-      },
-      {
-        onSuccess: () => {
-          setTitle('');
-          setNotes('');
-          setImagePath('');
-          setOpen(false);
-        },
-      }
-    );
+  const handleOpenCreate = () => {
+    setSelectedItem(null);
+    setDialogMode('create');
+    setDialogOpen(true);
   };
 
-  const handleClickCreate = () => {
-    setOpen(true);
+  const handleOpenUpdate = (item: ItemSummaryDto) => {
+    setSelectedItem(item);
+    setDialogMode('update');
+    setDialogOpen(true);
+  };
+
+  const handleDialogSubmit = (data: {
+    title: string;
+    notes?: string | null;
+    imagePath?: string | null;
+  }) => {
+    if (dialogMode === 'create') {
+      const dto: ItemCreateDto = {
+        title: data.title,
+        ...(data.notes !== undefined && { notes: data.notes ?? undefined }),
+        ...(data.imagePath !== undefined && {
+          imagePath: data.imagePath ?? undefined,
+        }),
+      };
+      createItem({ listId, dto });
+    } else if (selectedItem) {
+      const dto: Partial<ItemUpdateDto> = {};
+      if (data.title !== selectedItem.title) dto.title = data.title;
+      if (data.notes !== undefined) dto.notes = data.notes ?? undefined;
+      if (data.imagePath !== undefined)
+        dto.imagePath = data.imagePath ?? undefined;
+      updateItem({ listId, id: selectedItem.id!, dto });
+    }
   };
 
   return (
@@ -100,7 +86,7 @@ export default function ListModule() {
               variant="contained"
               color="success"
               startIcon={<AddIcon />}
-              onClick={handleClickCreate}
+              onClick={handleOpenCreate}
               size="large"
             >
               Create New Item
@@ -111,7 +97,7 @@ export default function ListModule() {
               key={item.id}
               item={item}
               index={index}
-              onEdit={handleEdit}
+              onEdit={handleOpenUpdate}
               onDelete={handleDelete}
             />
           ))}
@@ -126,56 +112,16 @@ export default function ListModule() {
       ) : (
         'Loading content'
       )}
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Create New Item</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            fullWidth
-            variant="outlined"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            slotProps={{ htmlInput: { maxLength: 100 } }}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Notes"
-            fullWidth
-            variant="outlined"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            slotProps={{ htmlInput: { maxLength: 2000 } }}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Image Path"
-            fullWidth
-            variant="outlined"
-            value={imagePath}
-            onChange={(e) => setImagePath(e.target.value)}
-            slotProps={{ htmlInput: { maxLength: 2000 } }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleCreate}
-            variant="contained"
-            disabled={!title.trim()}
-          >
-            {'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ItemDialog
+        key={dialogOpen ? `${dialogMode}-${selectedItem?.title}` : 'closed'}
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={handleDialogSubmit}
+        mode={dialogMode}
+        initialTitle={selectedItem?.title}
+        initialNotes={selectedItem?.notes}
+        initialImagePath={selectedItem?.imagePath}
+      />
     </div>
   );
 }
