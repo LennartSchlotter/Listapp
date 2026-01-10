@@ -92,11 +92,10 @@ export default function ListModule() {
               Create New Item
             </Button>
           </Box>
-          {data!.items?.map((item: ItemSummaryDto, index: number) => (
+          {data!.items?.map((item: ItemSummaryDto) => (
             <ItemModule
               key={item.id}
               item={item}
-              index={index}
               onEdit={handleOpenUpdate}
               onDelete={handleDelete}
             />

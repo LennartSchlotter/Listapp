@@ -15,17 +15,11 @@ import type { ItemSummaryDto } from '../../../api';
 
 interface ItemModuleProps {
   item: ItemSummaryDto;
-  index: number;
   onEdit: (item: ItemSummaryDto) => void;
   onDelete: (item: ItemSummaryDto) => void;
 }
 
-const ItemModule: React.FC<ItemModuleProps> = ({
-  item,
-  index,
-  onEdit,
-  onDelete,
-}) => {
+const ItemModule: React.FC<ItemModuleProps> = ({ item, onEdit, onDelete }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
@@ -34,7 +28,7 @@ const ItemModule: React.FC<ItemModuleProps> = ({
     <>
       <div className="flex items-center border-b hover:bg-gray-50 transition-colors">
         <div className="w-12 text-center text-gray-500 font-medium py-4">
-          {index + 1}.
+          {item.position! + 1}.
         </div>
         <ListItem
           className="flex-1 cursor-pointer"
