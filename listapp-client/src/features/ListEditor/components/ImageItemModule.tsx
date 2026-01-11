@@ -13,6 +13,7 @@ import type { ItemSummaryDto } from '../../../api';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ItemDetailsDialog } from './ItemDetailsDialog';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 interface ImageItemModuleProps {
   item: ItemSummaryDto;
@@ -36,7 +37,7 @@ const ImageItemModule: React.FC<ImageItemModuleProps> = ({
 
   return (
     <>
-      <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <div ref={setNodeRef} style={style} {...attributes}>
         <Card
           sx={{
             height: 240,
@@ -96,6 +97,14 @@ const ImageItemModule: React.FC<ImageItemModuleProps> = ({
           >
             <IconButton
               size="small"
+              {...listeners}
+              onClick={(e) => e.stopPropagation()}
+              sx={{ cursor: 'grab' }}
+            >
+              <DragIndicatorIcon />
+            </IconButton>
+            <IconButton
+              size="small"
               aria-label="edit"
               onClick={(e) => {
                 e.stopPropagation();
@@ -127,7 +136,6 @@ const ImageItemModule: React.FC<ImageItemModuleProps> = ({
           </Box>
         </Card>
       </div>
-
       <ItemDetailsDialog
         open={openDialog}
         item={item}

@@ -6,6 +6,7 @@ import type { ItemSummaryDto } from '../../../api';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ItemDetailsDialog } from './ItemDetailsDialog';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 interface ItemModuleProps {
   item: ItemSummaryDto;
@@ -22,7 +23,7 @@ const ItemModule: React.FC<ItemModuleProps> = ({ item, onEdit, onDelete }) => {
 
   return (
     <>
-      <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <div ref={setNodeRef} style={style} {...attributes}>
         <div className="flex items-center border-b hover:bg-gray-50 transition-colors">
           <div className="w-12 text-center text-gray-500 font-medium py-4">
             {item.position! + 1}.
@@ -32,6 +33,14 @@ const ItemModule: React.FC<ItemModuleProps> = ({ item, onEdit, onDelete }) => {
             onClick={handleOpenDialog}
             secondaryAction={
               <div className="flex space-x-2 pr-4">
+                <IconButton
+                  size="large"
+                  {...listeners}
+                  onClick={(e) => e.stopPropagation()}
+                  sx={{ cursor: 'grab' }}
+                >
+                  <DragIndicatorIcon />
+                </IconButton>
                 <IconButton
                   edge="end"
                   aria-label="edit"
