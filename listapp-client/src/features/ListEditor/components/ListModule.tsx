@@ -26,6 +26,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { useReorderItems } from '../hooks/useReorderItems';
+import ImageItemModule from './ImageItemModule';
 
 type ViewMode = 'text' | 'image';
 
@@ -110,10 +111,27 @@ export default function ListModule() {
     });
   };
 
+  /**
+   * About as safe as it gets with this approach, not ideal.
+   * Should consider limiting domains and/or file upload, limited by service rn. Might take a look in the future.
+   */
+  const isSafeImage = (item: ItemSummaryDto) => {
+    return (
+      item.imagePath &&
+      item.imagePath.startsWith('https://') &&
+      !item.imagePath.toLowerCase().includes('.svg') &&
+      !item.imagePath.toLowerCase().includes('data:') &&
+      /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(item.imagePath)
+    );
+  };
+
   const isImageModeAvailable =
     items.length > 0 &&
     items.every(
-      (i) => typeof i.imagePath === 'string' && i.imagePath.trim() !== ''
+      (item) =>
+        typeof item.imagePath === 'string' &&
+        item.imagePath.trim() !== '' &&
+        isSafeImage(item)
     );
 
   return (
@@ -128,7 +146,7 @@ export default function ListModule() {
               mb: 4,
             }}
           >
-            {isImageModeAvailable ? (
+            {isImageModeAvailable && (
               <ToggleButtonGroup
                 color="primary"
                 value={viewMode}
@@ -140,8 +158,6 @@ export default function ListModule() {
                 <ToggleButton value="image">Image Mode</ToggleButton>
                 <ToggleButton value="text">Text Mode</ToggleButton>
               </ToggleButtonGroup>
-            ) : (
-              ''
             )}
             <h1 className="text-3xl font-bold text-center mb-8">
               {data.title}
@@ -160,14 +176,23 @@ export default function ListModule() {
             items={items.map((i) => i.id!)}
             strategy={verticalListSortingStrategy}
           >
-            {items.map((item) => (
-              <ItemModule
-                key={item.id}
-                item={item}
-                onEdit={handleOpenUpdate}
-                onDelete={handleDelete}
-              />
-            ))}
+            {items.map((item) =>
+              viewMode === 'text' ? (
+                <ItemModule
+                  key={item.id}
+                  item={item}
+                  onEdit={handleOpenUpdate}
+                  onDelete={handleDelete}
+                />
+              ) : (
+                <ImageItemModule
+                  key={item.id}
+                  item={item}
+                  onEdit={handleOpenUpdate}
+                  onDelete={handleDelete}
+                />
+              )
+            )}
           </SortableContext>
           {items.length === 0 && (
             <p className="text-center py-8 text-gray-500">
