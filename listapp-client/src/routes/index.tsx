@@ -1,8 +1,8 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import { LoginButton } from '../components/LoginButton';
 import { useEffect } from 'react';
 import { getUser } from '../api';
 import { apiClient } from '../lib/apiClient';
+import LoginModule from '../features/Login/components/LoginModule';
 
 export const Route = createFileRoute('/')({
   component: UnauthenticatedHome,
@@ -26,8 +26,7 @@ function UnauthenticatedHome() {
 
   return (
     <div>
-      <h1>Welcome</h1>
-      <LoginButton />
+      <LoginModule />
     </div>
   );
 }
