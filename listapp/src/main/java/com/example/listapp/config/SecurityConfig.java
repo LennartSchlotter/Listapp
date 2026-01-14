@@ -34,7 +34,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    /**
+     * Success Handler to use for OAuth2 login.
+     */
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    /**
+     * Authentication Service to use for OAuth2 login.
+     */
     private final AuthenticationService authenticationService;
 
     /**
@@ -44,18 +51,20 @@ public class SecurityConfig {
      * @throws Exception if configuration fails.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http)
+        throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(
+                    CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CustomCsrfTokenRequestHandler())
             )
             .addFilterAfter(csrfTokenBootstrapFilter(), CsrfFilter.class)
             .securityContext(securityContext -> securityContext
                 .requireExplicitSave(false)
             )
-            .sessionManagement(session -> 
+            .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                     .sessionFixation().none()
             )
@@ -80,7 +89,8 @@ public class SecurityConfig {
             )
             .exceptionHandling(exception -> exception
                 .defaultAuthenticationEntryPointFor(
-                    (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED),
+                    (request, response, authException) -> response.sendError(
+                        HttpServletResponse.SC_UNAUTHORIZED),
                     request -> request.getRequestURI().startsWith("/api/")
                 )
             )
@@ -90,7 +100,7 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
             );
-        
+
         return http.build();
     }
 
@@ -101,14 +111,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:8080"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:5173", "http://localhost:8080"));
+        configuration.setAllowedMethods(List.of(
+            "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of("*"));
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
@@ -121,9 +134,14 @@ public class SecurityConfig {
     public OncePerRequestFilter csrfTokenBootstrapFilter() {
         return new OncePerRequestFilter() {
             @Override
-            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+            protected void doFilterInternal(
+                final HttpServletRequest request,
+                final HttpServletResponse response,
+                final FilterChain filterChain
+            ) throws ServletException, IOException {
 
-                Object csrfAttr = request.getAttribute(CsrfToken.class.getName());
+                Object csrfAttr = request.getAttribute(
+                    CsrfToken.class.getName());
                 if (csrfAttr instanceof CsrfToken csrfToken) {
                     csrfToken.getToken();
                 }
