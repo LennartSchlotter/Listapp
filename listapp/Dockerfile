@@ -14,7 +14,7 @@ COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN ./mvnw dependency:go-offline
 COPY src ./src
-RUN ./mvnw package -DskipTests
+RUN ./mvnw verify
 
 # ==== Production ====
 FROM eclipse-temurin:21-jre-alpine AS production
