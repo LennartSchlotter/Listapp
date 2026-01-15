@@ -29,53 +29,86 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@Tag(name = "User Controller", description = "APIs for managing authenticated users")
+@Tag(name = "User Controller", description =
+    "APIs for managing authenticated users")
 public class UserController {
 
-    private final UserService _userService;
+    /**
+     * Service for the user business logic.
+     */
+    private final UserService userService;
 
-    public UserController(UserService userService){
-        _userService = userService;
+    /**
+     * Constructor for the User Controller.
+     * @param userServiceParam service responsible for user business logic
+     */
+    public UserController(final UserService userServiceParam) {
+        this.userService = userServiceParam;
     }
 
-    @Operation(summary = "Get current user", description = "Retrieve details of the authenticated user")
+    /**
+     * Retrieves the currently authenticated user.
+     * @return An API response representing the result of the call.
+     */
+    @Operation(summary = "Get current user", description =
+        "Retrieve details of the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User retrieved successfully",
+        @ApiResponse(responseCode = "200", description =
+            "User retrieved successfully",
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = UserResponseDto.class)))
     })
     @GetMapping
     @ResponseBody
-    public ResponseEntity<UserResponseDto> GetUser(){
+    public ResponseEntity<UserResponseDto> getUser() {
 
-        UserResponseDto response = _userService.getUser();
+        UserResponseDto response = userService.getUser();
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Update current user", description = "Update details of the authenticated user")
+    /**
+     * Updates the currently authenticated user.
+     * @param dto The request body containing the data for the user.
+     * @return An API response representing the result of the call.
+     */
+    @Operation(summary = "Update current user", description =
+        "Update details of the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User updated successfully",
+        @ApiResponse(responseCode = "200", description =
+            "User updated successfully",
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = UUID.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid request data",
+        @ApiResponse(responseCode = "400", description =
+            "Invalid request data",
             content = @Content(mediaType = "application/json",
                 schema = @Schema(implementation = ProblemDetail.class)))
     })
     @PatchMapping
     @ResponseBody
-    public ResponseEntity<UUID> UpdateUser(@Valid @RequestBody UserUpdateDto dto){
-        UUID updatedId = _userService.updateUser(dto);
+    public ResponseEntity<UUID> updateUser(
+        final @Valid @RequestBody UserUpdateDto dto) {
+        UUID updatedId = userService.updateUser(dto);
         return ResponseEntity.ok(updatedId);
     }
 
-    @Operation(summary = "Delete current user", description = "Deletes the authenticated user")
+    /**
+     * Deletes the currently authenticated user.
+     * @param request Request Servlet entity to end the user session.
+     * @param response Response Servlet entity to end the user session.
+     * @return An API response representing the result of the call.
+     */
+    @Operation(summary = "Delete current user", description =
+        "Deletes the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "User account deleted successfully")
+        @ApiResponse(responseCode = "204", description =
+            "User account deleted successfully")
     })
     @DeleteMapping
     @ResponseBody
-    public ResponseEntity<Void> DeleteUser(HttpServletRequest request, HttpServletResponse response){
-        _userService.deleteUser();
+    public ResponseEntity<Void> deleteUser(
+        final HttpServletRequest request,
+        final HttpServletResponse response) {
+        userService.deleteUser();
         new SecurityContextLogoutHandler().logout(request, response, null);
         return ResponseEntity.noContent().build();
     }
