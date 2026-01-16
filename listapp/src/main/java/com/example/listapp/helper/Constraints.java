@@ -1,9 +1,9 @@
-package com.example.listapp.dto;
+package com.example.listapp.helper;
 
 /**
  * Constraints used for validation in DTOs.
  */
-public final class DtoConstraints {
+public final class Constraints {
 
     /**
      * Static variable for the max length of the title of an object.
@@ -35,7 +35,7 @@ public final class DtoConstraints {
      */
     public static final int EMAIL_MAX_LENGTH = 255;
 
-    private DtoConstraints() {
+    private Constraints() {
         throw new AssertionError("Cannot instantiate utility class");
     }
 }
