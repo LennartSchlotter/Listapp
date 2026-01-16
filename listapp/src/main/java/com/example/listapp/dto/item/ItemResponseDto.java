@@ -12,4 +12,4 @@ public record ItemResponseDto(
     Instant createdAt,
     Instant updatedAt,
     Long version
-){}
+) { }

@@ -16,4 +16,4 @@ public record ListResponseDto(
     Long version,
     UserSummaryDto owner,
     Set<ItemSummaryDto> items
-){}
+) { }

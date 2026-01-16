@@ -14,4 +14,4 @@ public record UserResponseDto(
     Instant updatedAt,
     Long version,
     Set<ListSummaryDto> lists
-){}
+) { }
