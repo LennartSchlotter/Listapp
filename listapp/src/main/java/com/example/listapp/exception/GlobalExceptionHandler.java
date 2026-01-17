@@ -24,13 +24,15 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 
     /**
-     * Handles custom application exceptions
+     * Handles custom application exceptions.
      * @param ex The Exception thrown.
      * @param request The request that caused the exception.
-     * @return a response entity containing the response and the status of the exception.
+     * @return an entity containing the response and status of the exception.
      */
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ErrorResponseDto> handleApplicationException(ApplicationException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleApplicationException(
+        final ApplicationException ex, final WebRequest request) {
+
         log.error("Application exception occured: {}", ex.getMessage(), ex);
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
@@ -47,10 +49,12 @@ public class GlobalExceptionHandler {
      * Handles validation errors.
      * @param ex The Exception thrown.
      * @param request The request that caused the exception.
-     * @return a response entity containing the response and the status of the exception.
+     * @return an entity containing the response and status of the exception.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> handleValidationException(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleValidationException(
+        final MethodArgumentNotValidException ex, final WebRequest request) {
+
         log.error("Validation error occured", ex);
 
         Map<String, String> validationErrors = new HashMap<>();
@@ -74,15 +78,20 @@ public class GlobalExceptionHandler {
      * Handles constraint violations.
      * @param ex The Exception thrown.
      * @param request The request that caused the exception.
-     * @return a response entity containing the response and the status of the exception.
+     * @return an entity containing the response and status of the exception.
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(
+        final ConstraintViolationException ex, final WebRequest request) {
+
         log.error("Constraint violation occured", ex);
 
         Map<String, String> validationErrors = new HashMap<>();
         ex.getConstraintViolations().forEach(violation ->
-            validationErrors.put(violation.getPropertyPath().toString(), violation.getMessage())
+            validationErrors.put(
+                violation.getPropertyPath().toString(),
+                violation.getMessage()
+            )
         );
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
@@ -101,41 +110,67 @@ public class GlobalExceptionHandler {
      * Handles missing request parameters.
      * @param ex The Exception thrown.
      * @param request The request that caused the exception.
-     * @return a response entity containing the response and the status of the exception.
+     * @return an entity containing the response and status of the exception.
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponseDto> handleMissingParams(MissingServletRequestParameterException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleMissingParams(
+        final MissingServletRequestParameterException ex,
+        final WebRequest request
+    ) {
+
         log.error("Missing request parameters: {}", ex.getParameterName(), ex);
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
             HttpStatus.BAD_REQUEST.value(),
             HttpStatus.BAD_REQUEST.getReasonPhrase(),
-            String.format("Required parameter '%s' is missing", ex.getParameterName()),
+            String.format(
+                "Required parameter '%s' is missing",
+                ex.getParameterName()
+            ),
             "MISSING_PARAMETER"
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ErrorResponseDto> handleSpringSecurityAccessDenied(
-        org.springframework.security.access.AccessDeniedException ex,
-        WebRequest request) {
-    
+    /**
+     * Handles access denied exceptions.
+     * @param ex The Exception thrown.
+     * @param request The request that caused the exception.
+     * @return an entity containing the response and status of the exception.
+     */
+    @ExceptionHandler(
+        org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto>
+        handleSpringSecurityAccessDenied(
+        final org.springframework.security.access.AccessDeniedException ex,
+        final WebRequest request
+    ) {
+
     log.warn("Access denied: {}", ex.getMessage());
-    
+
     ErrorResponseDto errorResponse = new ErrorResponseDto(
         HttpStatus.FORBIDDEN.value(),
         HttpStatus.FORBIDDEN.getReasonPhrase(),
         "You don't have permission to access this resource",
         "ACCESS_DENIED"
     );
-    
+
     return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
+    /**
+     * Handles argument type mismatch exceptions.
+     * @param ex The Exception thrown.
+     * @param request The request that caused the exception.
+     * @return an entity containing the response and status of the exception.
+     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponseDto> handleTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleTypeMismatch(
+        final MethodArgumentTypeMismatchException ex,
+        final WebRequest request
+    ) {
+
         log.error("Method argument type mismatch: {}", ex.getMessage(), ex);
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
@@ -152,10 +187,12 @@ public class GlobalExceptionHandler {
      * Handles all other exceptions.
      * @param ex The Exception thrown.
      * @param request The request that caused the exception.
-     * @return a response entity containing the response and the status of the exception.
+     * @return an entity containing the response and status of the exception.
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception ex, WebRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(
+        final Exception ex, final WebRequest request) {
+
         log.error("Unexpected error occured", ex);
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
@@ -165,6 +202,9 @@ public class GlobalExceptionHandler {
             "INTERNAL_SERVER_ERROR"
         );
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(
+            errorResponse,
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }

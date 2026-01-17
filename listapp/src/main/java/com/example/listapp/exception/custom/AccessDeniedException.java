@@ -5,7 +5,12 @@ import org.springframework.http.HttpStatus;
 import com.example.listapp.exception.base.ApplicationException;
 
 public class AccessDeniedException extends ApplicationException {
-    public AccessDeniedException(String message) {
+
+    /**
+     * Constructor for the Access Denied Exception.
+     * @param message message to be thrown alongisde the exception.
+     */
+    public AccessDeniedException(final String message) {
         super(message, HttpStatus.FORBIDDEN, "ACCESS_DENIED");
     }
 }

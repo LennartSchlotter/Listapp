@@ -3,26 +3,64 @@ package com.example.listapp.exception.base;
 import org.springframework.http.HttpStatus;
 
 public class ApplicationException extends RuntimeException {
-    private final HttpStatus _status;
-    private final String _errorCode;
 
-    public ApplicationException(String message, HttpStatus status, String errorCode) {
-        super(message);
-        _status = status;
-        _errorCode = errorCode;
+    /**
+     * The Http Status for the error thrown.
+     */
+    private final HttpStatus status;
+
+    /**
+     * The error code for the error thrown.
+     */
+    private final String errorCode;
+
+    /**
+     * Constructor for the Application Exception.
+     * @param messageField The message for the error.
+     * @param statusField The Http Status for the error.
+     * @param errorCodeField The error code for the error.
+     */
+    public ApplicationException(
+        final String messageField,
+        final HttpStatus statusField,
+        final String errorCodeField
+    ) {
+        super(messageField);
+        status = statusField;
+        errorCode = errorCodeField;
     }
 
-    public ApplicationException(String message, Throwable cause, HttpStatus status, String errorCode) {
-        super(message, cause);
-        _status = status;
-        _errorCode = errorCode;
+    /**
+     * Constructor for the application exception including a throwable cause.
+     * @param messageField The message for the error.
+     * @param causeField The cause for the error.
+     * @param statusField The Http Status for the error.
+     * @param errorCodeField The error code for the error.
+     */
+    public ApplicationException(
+        final String messageField,
+        final Throwable causeField,
+        final HttpStatus statusField,
+        final String errorCodeField
+    ) {
+        super(messageField, causeField);
+        status = statusField;
+        errorCode = errorCodeField;
     }
 
+    /**
+     * Getter for the Status.
+     * @return the status code.
+     */
     public HttpStatus getStatus() {
-        return _status;
+        return this.status;
     }
 
+    /***
+     * Getter for the error code.
+     * @return the error code.
+     */
     public String getErrorCode() {
-        return _errorCode;
+        return this.errorCode;
     }
 }
