@@ -17,14 +17,15 @@ public class SecurityUtil {
      * @return the currently authenticated user.
      */
     public User getCurrentUser() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var authentication = SecurityContextHolder
+            .getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AccessDeniedException("No authenticated user found");
         }
-        
+
         Object principal = authentication.getPrincipal();
-        
+
         if (principal instanceof CustomOidcUser user) {
             return user.getUser();
         } else {
