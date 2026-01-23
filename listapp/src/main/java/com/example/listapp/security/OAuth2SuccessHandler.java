@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public final class OAuth2SuccessHandler 
+public final class OAuth2SuccessHandler
     implements AuthenticationSuccessHandler {
 
     @Override
