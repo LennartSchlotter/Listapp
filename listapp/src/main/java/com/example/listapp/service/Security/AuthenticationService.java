@@ -1,4 +1,4 @@
-package com.example.listapp.service.Security;
+package com.example.listapp.service.security;
 
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -10,40 +10,50 @@ import com.example.listapp.entity.User;
 import com.example.listapp.repository.UserRepository;
 import com.example.listapp.security.CustomOidcUser;
 
-@Service
-public class AuthenticationService extends OidcUserService {
-    
-    private final UserRepository _userRepository;
+import lombok.RequiredArgsConstructor;
 
-    public AuthenticationService(UserRepository userRepository){
-        _userRepository = userRepository;
-    }
+@Service
+@RequiredArgsConstructor
+public final class AuthenticationService extends OidcUserService {
+
+    /**
+     * Repository containing user data.
+     */
+    private final UserRepository userRepository;
 
     @Override
-    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+    public OidcUser loadUser(final OidcUserRequest userRequest)
+        throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
 
-        String provider = userRequest.getClientRegistration().getRegistrationId();
+        String provider =
+            userRequest.getClientRegistration().getRegistrationId();
         String sub = (String) oidcUser.getSubject();
         String email = (String) oidcUser.getEmail();
         String name = (String) oidcUser.getFullName();
 
         // Create or update the user based on the OAuth data.
-        User userEntity = _userRepository.findByOauth2ProviderAndOauth2Sub(provider, sub)
-            .map(existingUser -> {
-                existingUser.setName(name);
-                existingUser.setEmail(email);
-                return _userRepository.save(existingUser);
-            })
-            .orElseGet(() -> {
-                User newUser = new User();
-                newUser.setOauth2Provider(provider);
-                newUser.setOauth2Sub(sub);
-                newUser.setEmail(email);
-                newUser.setName(name);
-                return _userRepository.save(newUser);
-            });
-        
-        return new CustomOidcUser(oidcUser.getAuthorities(), oidcUser.getIdToken(), oidcUser.getUserInfo(), userEntity);
+        User userEntity =
+            userRepository.findByOauth2ProviderAndOauth2Sub(provider, sub)
+                .map(existingUser -> {
+                    existingUser.setName(name);
+                    existingUser.setEmail(email);
+                    return userRepository.save(existingUser);
+                })
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setOauth2Provider(provider);
+                    newUser.setOauth2Sub(sub);
+                    newUser.setEmail(email);
+                    newUser.setName(name);
+                    return userRepository.save(newUser);
+                });
+
+        return new CustomOidcUser(
+            oidcUser.getAuthorities(),
+            oidcUser.getIdToken(),
+            oidcUser.getUserInfo(),
+            userEntity
+        );
     }
 }

@@ -19,49 +19,60 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    
-    private final UserRepository _userRepository;
-    private final UserMapper _userMapper;
-    private final SecurityUtil _securityUtil;
-    
+
+    /**
+     * Repository containing user data.
+     */
+    private final UserRepository userRepository;
+
+    /**
+     * Mapper for users.
+     */
+    private final UserMapper userMapper;
+
+    /**
+     * Util class to retrieve the current user.
+     */
+    private final SecurityUtil securityUtil;
+
     /**
      * Retrieves the currently authenticated user.
      * @return the currently authenticated user.
      */
     @Transactional(readOnly = true)
     public UserResponseDto getUser() {
-        User user = _securityUtil.getCurrentUser();
-        
-        UserResponseDto response = _userMapper.toResponseDto(user);
+        User user = securityUtil.getCurrentUser();
+
+        UserResponseDto response = userMapper.toResponseDto(user);
         return response;
     }
-    
+
     /**
      * Updates the currently authenticated user.
      * @param dto The to be changed values of the user.
      * @return The ID of the updated User.
      */
     @Transactional
-    public UUID updateUser(UserUpdateDto dto) {
-        User entityToUpdate = _securityUtil.getCurrentUser();
-        
+    public UUID updateUser(final UserUpdateDto dto) {
+        User entityToUpdate = securityUtil.getCurrentUser();
+
         dto.name().ifPresent(entityToUpdate::setName);
         dto.email().ifPresent(entityToUpdate::setEmail);
 
-        _userRepository.save(entityToUpdate);
+        userRepository.save(entityToUpdate);
         log.info("Updated user with id: {}", entityToUpdate.getId());
 
         return entityToUpdate.getId();
     }
-    
+
     /**
      * Deletes the currently authenticated user.
      */
     @Transactional
     public void deleteUser() {
-        User entity = _securityUtil.getCurrentUser();
+        User entity = securityUtil.getCurrentUser();
 
-        _userRepository.delete(entity);
+        userRepository.delete(entity);
         log.info("Deleted user with id: {}", entity.getId());
     }
 }

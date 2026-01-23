@@ -20,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.listapp.security.CustomCsrfTokenRequestHandler;
 import com.example.listapp.security.OAuth2SuccessHandler;
-import com.example.listapp.service.Security.AuthenticationService;
+import com.example.listapp.service.security.AuthenticationService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

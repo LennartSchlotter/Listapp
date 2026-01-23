@@ -26,21 +26,32 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ListService {
 
-    private final ListRepository _listRepository;
-    private final ListMapper _listMapper;
-    private final SecurityUtil _securityUtil;
-    
+    /**
+     * Repository containing list data.
+     */
+    private final ListRepository listRepository;
+
+    /**
+     * Mapper for lists.
+     */
+    private final ListMapper listMapper;
+
+    /**
+     * Util class to retrieve the current user.
+     */
+    private final SecurityUtil securityUtil;
+
     /**
      * Retrieves all lists associated with the authenticated user.
      * @return a list of lists.
      */
     @Transactional(readOnly = true)
     public List<ListResponseDto> getAllUserLists() {
-        UUID ownerId = _securityUtil.getCurrentUser().getId();
-        List<ListEntity> entityList = _listRepository.findAllByOwnerId(ownerId);
+        UUID ownerId = securityUtil.getCurrentUser().getId();
+        List<ListEntity> entityList = listRepository.findAllByOwnerId(ownerId);
 
         List<ListResponseDto> dtoList = entityList.stream()
-            .map(entity -> _listMapper.toResponseDto(entity))
+            .map(entity -> listMapper.toResponseDto(entity))
             .collect(Collectors.toList());
 
         return dtoList;
@@ -52,14 +63,15 @@ public class ListService {
      * @return The List with the specified ID.
      */
     @Transactional(readOnly = true)
-    public ListResponseDto getListById(UUID id) {
-        ListEntity entity = _listRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("List", id.toString()));
+    public ListResponseDto getListById(final UUID id) {
+        ListEntity entity = listRepository.findById(id)
+            .orElseThrow(()
+                -> new ResourceNotFoundException("List", id.toString()));
 
         validateOwnership(entity);
 
-        ListResponseDto response = _listMapper.toResponseDto(entity);
-        
+        ListResponseDto response = listMapper.toResponseDto(entity);
+
         return response;
     }
 
@@ -69,14 +81,18 @@ public class ListService {
      * @return The ID of the created list.
      */
     @Transactional
-    public UUID createList(ListCreateDto dto) {
-        ListEntity entity = _listMapper.toEntity(dto);
+    public UUID createList(final ListCreateDto dto) {
+        ListEntity entity = listMapper.toEntity(dto);
 
-        User currentUser = _securityUtil.getCurrentUser();
+        User currentUser = securityUtil.getCurrentUser();
         entity.setOwner(currentUser);
 
-        ListEntity savedEntity =_listRepository.save(entity);
-        log.info("Created list with id: {} for user: {}", savedEntity.getId(), currentUser.getId());
+        ListEntity savedEntity = listRepository.save(entity);
+        log.info(
+            "Created list with id: {} for user: {}",
+            savedEntity.getId(),
+            currentUser.getId()
+        );
 
         return savedEntity.getId();
     }
@@ -88,16 +104,17 @@ public class ListService {
      * @return The ID of the updated list.
      */
     @Transactional
-    public UUID updateList(UUID id, ListUpdateDto dto) {
-        ListEntity entityToUpdate = _listRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("List", id.toString()));
-        
+    public UUID updateList(final UUID id, final ListUpdateDto dto) {
+        ListEntity entityToUpdate = listRepository.findById(id)
+            .orElseThrow(()
+                -> new ResourceNotFoundException("List", id.toString()));
+
         validateOwnership(entityToUpdate);
 
         dto.title().ifPresent(entityToUpdate::setTitle);
         dto.description().ifPresent(entityToUpdate::setDescription);
 
-        _listRepository.save(entityToUpdate);
+        listRepository.save(entityToUpdate);
         log.info("Updated list with id: {}", id);
 
         return entityToUpdate.getId();
@@ -108,23 +125,25 @@ public class ListService {
      * @param id The ID of the list to delete.
      */
     @Transactional
-    public void deleteList(UUID id) {
-        ListEntity entity = _listRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("List", id.toString()));
-        
+    public void deleteList(final UUID id) {
+        ListEntity entity = listRepository.findById(id)
+            .orElseThrow(()
+                -> new ResourceNotFoundException("List", id.toString()));
+
         validateOwnership(entity);
 
         entity.markAsDeleted();
-        _listRepository.save(entity);
+        listRepository.save(entity);
         log.info("Soft deleted list with id: {}", id);
     }
 
-    private void validateOwnership(ListEntity entity) {
-        User currentUser = _securityUtil.getCurrentUser();
+    private void validateOwnership(final ListEntity entity) {
+        User currentUser = securityUtil.getCurrentUser();
         if (!entity.getOwner().getId().equals(currentUser.getId())) {
-            log.warn("User {} attempted to access list {} owned by user {}", 
+            log.warn("User {} attempted to access list {} owned by user {}",
                 currentUser.getId(), entity.getId(), entity.getOwner().getId());
-            throw new AccessDeniedException("You don't have permission to access this list");
+            throw new AccessDeniedException(
+                "You don't have permission to access this list");
         }
     }
 }

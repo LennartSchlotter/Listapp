@@ -1,4 +1,4 @@
-package com.example.listapp.service.Security;
+package com.example.listapp.service.security;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,25 +10,32 @@ import com.example.listapp.entity.User;
 import com.example.listapp.repository.ListRepository;
 import com.example.listapp.security.SecurityUtil;
 
+import lombok.RequiredArgsConstructor;
+
 @Component("listSecurity")
+@RequiredArgsConstructor
 public class ListSecurityService {
 
-    private final ListRepository _listRepository;
-    private final SecurityUtil _securityUtil;
-
-    public ListSecurityService(ListRepository listRepository, SecurityUtil securityUtil){
-        _listRepository = listRepository;
-        _securityUtil = securityUtil;
-    }
+    /**
+     * Repository containing list data.
+     */
+    private final ListRepository listRepository;
 
     /**
-     * Helper method to determine whether the currently authenticated user owns a specified list.
-     * @param listId The ID of the list to perform the check for.
-     * @return a boolean representing whether or not the currently authenticated user is the owner of the requested list.
+     * Util class to retrieve the current user.
      */
-    public boolean isOwner(UUID listId){
-        User currentUser = _securityUtil.getCurrentUser();
-        Optional<ListEntity> optional = _listRepository.findByIdAndOwnerId(listId, currentUser.getId());
+    private final SecurityUtil securityUtil;
+
+    /**
+     * Helper method to determine if the authenticated user owns a list.
+     * @param listId The ID of the list to perform the check for.
+     * @return if the currently authenticated user is the owner of the list.
+     */
+    public boolean isOwner(final UUID listId) {
+        User currentUser = securityUtil.getCurrentUser();
+        Optional<ListEntity> optional = listRepository.findByIdAndOwnerId(
+            listId, currentUser.getId()
+        );
         return optional.isPresent();
     }
 }

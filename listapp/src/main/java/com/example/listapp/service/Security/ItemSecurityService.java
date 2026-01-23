@@ -1,4 +1,4 @@
-package com.example.listapp.service.Security;
+package com.example.listapp.service.security;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -10,39 +10,51 @@ import com.example.listapp.repository.ItemRepository;
 import com.example.listapp.repository.ListRepository;
 import com.example.listapp.security.SecurityUtil;
 
-@Component("itemSecurity")
-public class ItemSecurityService {
-    
-    private final ItemRepository _itemRepository;
-    private final ListRepository _listRepository;
-    private final SecurityUtil _securityUtil;
+import lombok.RequiredArgsConstructor;
 
-    public ItemSecurityService(ItemRepository itemRepository, ListRepository listRepository, SecurityUtil securityUtil){
-        _itemRepository = itemRepository;
-        _listRepository = listRepository;
-        _securityUtil = securityUtil;
-    }
+@Component("itemSecurity")
+@RequiredArgsConstructor
+public class ItemSecurityService {
+
+    /**
+     * Repository containing item data.
+     */
+    private final ItemRepository itemRepository;
+
+    /**
+     * Repository containing list data.
+     */
+    private final ListRepository listRepository;
+
+    /**
+     * Util class to retrieve the current user.
+     */
+    private final SecurityUtil securityUtil;
 
     /**
      * Helper method to determine whether a user can access a specific item.
      * @param listId The ID of the list the item to be retrieved belongs to.
      * @param itemId The ID of the item to perform the check for.
-     * @return a boolean representing whether or not the currently authenticated user can access the requested item.
+     * @return if the currently authenticated user can access the item.
      */
-    public boolean canAccessItem(UUID listId, UUID itemId) {
-        User currentUser = _securityUtil.getCurrentUser();
-        return (_itemRepository.findByIdAndListId(itemId, listId) != null) 
-            && (_listRepository.findByIdAndOwnerId(listId, currentUser.getId()) != null);
+    public boolean canAccessItem(final UUID listId, final UUID itemId) {
+        User currentUser = securityUtil.getCurrentUser();
+        return (itemRepository.findByIdAndListId(itemId, listId) != null)
+            && (listRepository.findByIdAndOwnerId(
+                listId, currentUser.getId()) != null
+            );
     }
 
     /**
      * Helper method to determine whether a user can access a specific list.
      * @param listId The ID of the list to perform the check for.
-     * @return a boolean representing whether or not the currently authenticated user can access the requested list.
+     * @return if the currently authenticated user can access the list.
      */
-    public boolean canAccessList(UUID listId) {
-        User currentUser = _securityUtil.getCurrentUser();
-        Optional<?> optionalList = _listRepository.findByIdAndOwnerId(listId, currentUser.getId());
+    public boolean canAccessList(final UUID listId) {
+        User currentUser = securityUtil.getCurrentUser();
+        Optional<?> optionalList = listRepository.findByIdAndOwnerId(
+            listId, currentUser.getId()
+        );
         return optionalList.isPresent();
     }
 }

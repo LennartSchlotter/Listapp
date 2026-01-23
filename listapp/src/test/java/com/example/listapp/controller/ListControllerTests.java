@@ -36,7 +36,7 @@ import com.example.listapp.dto.list.ListUpdateDto;
 import com.example.listapp.exception.custom.ResourceAlreadyExistsException;
 import com.example.listapp.exception.custom.ResourceNotFoundException;
 import com.example.listapp.service.ListService;
-import com.example.listapp.service.Security.ListSecurityService;
+import com.example.listapp.service.security.ListSecurityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
