@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD Suppression Configuration 1.0//EN"
+    "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+    <!-- Completely exclude a specific file -->
+    <suppress files="ListappApplication\.java$" checks=".*"/>
+</suppressions>
