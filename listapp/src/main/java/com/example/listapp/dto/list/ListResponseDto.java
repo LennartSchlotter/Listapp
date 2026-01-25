@@ -16,4 +16,12 @@ public record ListResponseDto(
     Long version,
     UserSummaryDto owner,
     Set<ItemSummaryDto> items
-) { }
+) {
+
+    /**
+     * Safely copies the list as immutability guarantee.
+     */
+    public ListResponseDto {
+        items = items == null ? Set.of() : Set.copyOf(items);
+    }
+}
