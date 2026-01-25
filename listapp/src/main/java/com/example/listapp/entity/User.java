@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.example.listapp.helper.Constraints;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,6 +36,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users")
+@SuppressFBWarnings("EI_EXPOSE_REP")
 public class User {
 
     /**

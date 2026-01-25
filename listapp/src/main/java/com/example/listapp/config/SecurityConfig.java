@@ -22,6 +22,7 @@ import com.example.listapp.security.CustomCsrfTokenRequestHandler;
 import com.example.listapp.security.OAuth2SuccessHandler;
 import com.example.listapp.service.security.AuthenticationService;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 public class SecurityConfig {
 
     /**

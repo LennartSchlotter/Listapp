@@ -16,6 +16,7 @@ import com.example.listapp.dto.user.UserResponseDto;
 import com.example.listapp.dto.user.UserUpdateDto;
 import com.example.listapp.service.UserService;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 @RequestMapping("/api/v1/user")
 @Tag(name = "User Controller", description =
     "APIs for managing authenticated users")

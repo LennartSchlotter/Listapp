@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.example.listapp.helper.Constraints;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -37,6 +38,7 @@ import lombok.Setter;
 @Table(name = "list_items", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"list_id", "position"})
 })
+@SuppressFBWarnings("EI_EXPOSE_REP")
 public class Item {
 
     /**

@@ -20,6 +20,7 @@ import com.example.listapp.dto.item.ItemReorderDto;
 import com.example.listapp.dto.item.ItemUpdateDto;
 import com.example.listapp.service.ItemService;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 @RequestMapping("/api/v1/lists/{listId}/items")
 @Tag(name = "Item Controller", description =
     "APIs for managing items as part of lists")

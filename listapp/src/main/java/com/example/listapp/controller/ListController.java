@@ -22,6 +22,7 @@ import com.example.listapp.dto.list.ListResponseDto;
 import com.example.listapp.dto.list.ListUpdateDto;
 import com.example.listapp.service.ListService;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -33,6 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 @RequestMapping("/api/v1/lists")
 @Tag(name = "List Controller", description =
     "APIs for managing user-owned lists")
