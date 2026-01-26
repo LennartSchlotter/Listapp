@@ -26,7 +26,6 @@ import com.example.listapp.exception.custom.AccessDeniedException;
 import com.example.listapp.repository.ItemRepository;
 import com.example.listapp.repository.ListRepository;
 import com.example.listapp.security.SecurityUtil;
-import com.example.listapp.service.security.ItemSecurityService;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemSecurityServiceTests {

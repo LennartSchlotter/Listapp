@@ -23,7 +23,6 @@ import com.example.listapp.entity.User;
 import com.example.listapp.exception.custom.AccessDeniedException;
 import com.example.listapp.repository.ListRepository;
 import com.example.listapp.security.SecurityUtil;
-import com.example.listapp.service.security.ListSecurityService;
 
 @ExtendWith(MockitoExtension.class)
 public class ListSecurityServiceTests {
