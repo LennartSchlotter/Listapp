@@ -24,22 +24,37 @@ export default function AllListsModule() {
     null
   );
 
+  /**
+   * Handles opening the delete dialog.
+   * @param list The information of the list to be deleted.
+   */
   const handleDelete = (list: ListResponseDto) => {
     deleteList({ id: list.id! });
   };
 
+  /**
+   * Handles opening the create dialog.
+   */
   const handleOpenCreate = () => {
     setSelectedList(null);
     setDialogMode('create');
     setDialogOpen(true);
   };
 
+  /**
+   * Handles opening the update dialog.
+   * @param list The information of the list to be updated.
+   */
   const handleOpenUpdate = (list: ListResponseDto) => {
     setSelectedList(list);
     setDialogMode('update');
     setDialogOpen(true);
   };
 
+  /**
+   * Handles submitting the entered data.
+   * @param data the data entered in the dialog.
+   */
   const handleDialogSubmit = (data: {
     title: string;
     description?: string | null;

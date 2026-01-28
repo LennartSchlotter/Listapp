@@ -46,6 +46,9 @@ export default function ProfileModule() {
 
   const hasChanges = name !== (data.name ?? '') || email !== (data.email ?? '');
 
+  /**
+   * Handles saving the user.
+   */
   const handleSave = () => {
     if (!hasChanges) return;
     updateUser({
@@ -56,6 +59,9 @@ export default function ProfileModule() {
     });
   };
 
+  /**
+   * Handles deleting the user.
+   */
   const handleDelete = () => {
     deleteUser(undefined, {
       onSuccess: () => {

@@ -59,18 +59,29 @@ export default function ListModule() {
     });
   };
 
+  /**
+   * Handles opening the create module.
+   */
   const handleOpenCreate = () => {
     setSelectedItem(null);
     setDialogMode('create');
     setDialogOpen(true);
   };
 
+  /**
+   * Handles opening the update module.
+   * @param item The information of the item present in the dialog.
+   */
   const handleOpenUpdate = (item: ItemSummaryDto) => {
     setSelectedItem(item);
     setDialogMode('update');
     setDialogOpen(true);
   };
 
+  /**
+   * Handles submitting the input of the dialog.
+   * @param data The data submitted in the dialog.
+   */
   const handleDialogSubmit = (data: {
     title: string;
     notes?: string | null;
@@ -95,6 +106,10 @@ export default function ListModule() {
     }
   };
 
+  /**
+   * Handles the user stopping to drag an item.
+   * @param event The event associated with the mouse release.
+   */
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -125,6 +140,9 @@ export default function ListModule() {
     );
   };
 
+  /**
+   * Determines whether the image mode is available for the list.
+   */
   const isImageModeAvailable =
     items.length > 0 &&
     items.every(

@@ -35,6 +35,9 @@ export function ItemDialog({
   const [notes, setNotes] = useState(() => initialNotes ?? '');
   const [imagePath, setImagePath] = useState(() => initialImagePath ?? '');
 
+  /**
+   * Handles submitting the inputs of the dialog
+   */
   const handleSubmit = () => {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) return;

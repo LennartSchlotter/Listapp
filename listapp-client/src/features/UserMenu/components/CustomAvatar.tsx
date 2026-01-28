@@ -15,6 +15,11 @@ export default function CustomAvatar() {
 
   const userName = user.data?.name;
 
+  /**
+   * Translates the passed string into a color.
+   * @param string the string to be converted.
+   * @returns a color value.
+   */
   function stringToColor(string: string) {
     let hash = 0;
 
@@ -26,6 +31,11 @@ export default function CustomAvatar() {
     return `hsl(${hue}, 70%, 50%)`;
   }
 
+  /**
+   * Handles creating an initials avatar based on a passed name.
+   * @param name The name of the user to create an avatar for.
+   * @returns The HTML element for the colored string.
+   */
   function initialsAvatar(name: string) {
     if (!name || name.trim() === '') {
       return { sx: { bgcolor: '#808080' }, children: '?' };

@@ -11,14 +11,24 @@ export default function UserMenu() {
   const open = Boolean(anchorElement);
   const router = useRouter();
 
+  /**
+   * Handles clicking an element.
+   * @param event the mouse event corresponding the click.
+   */
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElement(event.currentTarget);
   };
 
+  /**
+   * Handles closing an element.
+   */
   const handleClose = () => {
     setAnchorElement(null);
   };
 
+  /**
+   * Handles accessing the profile by navigating to the profile page.
+   */
   const handleProfile = () => {
     handleClose();
     router.navigate({ to: '/app/profile' });
